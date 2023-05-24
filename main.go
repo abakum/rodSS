@@ -37,7 +37,7 @@ var (
 	caRoot       context.CancelFunc
 	multiBrowser = true
 	headLess     = true
-	upload       = false
+	// upload       = false
 	sequentially = false
 	browser      *rod.Browser
 	chromeBin    string
@@ -127,9 +127,9 @@ func main() {
 		if !multiBrowser {
 			browser.Close()
 		}
-		if upload {
-			taskKill("/fi", "windowtitle eq Открытие")
-		}
+		// if upload {
+		// 	taskKill("/fi", "windowtitle eq Открытие")
+		// }
 		stdo.Println("main Done", exit)
 		switch {
 		case exit == 0:
@@ -177,9 +177,9 @@ func main() {
 			continue
 		}
 		stdo.Println(de)
-		start(s97, 97, de, nil, nil)        //bat jpgs to mov
-		st = autoStart(started, sec)        //no one started
-		go start(s98, 98, de, &wg, started) //telegram
+		// start(s97, 97, de, nil, nil)        //bat jpgs to mov
+		st = autoStart(started, sec) //no one started
+		// go start(s98, 98, de, &wg, started) //telegram
 		go start(s99, 99, de, &wg, started) //ss
 		<-started
 		st.Stop()

@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
-	"github.com/go-rod/rod/lib/proto"
 )
 
 func s99(slide, deb int) {
@@ -19,27 +18,29 @@ func s99(slide, deb int) {
 		ok     bool
 	)
 	stdo.Println(params)
+	exp := func(x interface{}) {
+		e(slide, 14, x.(error))
+	}
 	browser, ca := chrome()
 	defer ca()
-	page := browser.MustPage().MustSetViewport(1920, 1080, 1, false)
+	page := browser.WithPanic(exp).
+		MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
+		MustNavigate(params[0]).MustWaitLoad()
 	defer page.Close()
-	ex(slide,
-		page.Navigate(params[0]),
-	)
-	ex(slide,
-		page.WaitLoad(),
-	)
-	tit := "ar-user-name"
+	tit := page.MustInfo().Title
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+
+	tit = "ar-user-name"
 	sel := fmt.Sprintf("input[name=%q]", tit)
 	se := "div.multiBtnInner_xbp:nth-child(1)"
 	for i := 0; i < 7; i++ {
 		stdo.Println(i)
-		ok, we, err = page.Has(sel)
+		ok, _, err = page.Has(sel)
 		if ok {
 			tit = "Авторизация"
 			break
 		}
-		ok, we, err = page.Has(se)
+		ok, _, err = page.Has(se)
 		if ok {
 			tit = "Кампания"
 			break
@@ -51,100 +52,76 @@ func s99(slide, deb int) {
 
 	if tit == "Авторизация" {
 		tit = "ar-user-name"
-		ex(slide, we.Input(params[1]))
+		page.Timeout(to).MustElement(sel).MustInput(params[1])
 		ex(slide, page.Keyboard.Press(input.Enter))
-		time.Sleep(ms)
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
-		tit = "ar-user-password"
-		sel = fmt.Sprintf("input[name=%q]", tit)
-		we, err = page.Timeout(to).Element(sel)
-		ex(slide, err)
-		ex(slide, we.Input(params[2]))
-		ex(slide, page.Keyboard.Press(input.Enter))
-		time.Sleep(ms)
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
-		we, err = page.Timeout(to).Element(se)
-		ex(slide, err)
+		tit = "ar-user-password"
+		sel = fmt.Sprintf("input[name=%q]", tit)
+		page.Timeout(to).MustElement(sel).MustInput(params[2])
+		ex(slide, page.Keyboard.Press(input.Enter))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 	}
-	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
-	time.Sleep(ms)
+	tit = "Кампания"
+	page.Timeout(to).MustElement(se).MustClick()
+	time.Sleep(sec)
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Удалить"
 	sel = "button.menu-button_J9B"
-	ok, we, _ = page.Has(sel)
+	ok, _, _ = page.Has(sel)
 	stdo.Println(tit, ok)
 	if ok {
-		ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
-		time.Sleep(ms)
+		page.Timeout(to).MustElement(sel).MustClick()
 		sel = "button.align-left_-232488494:nth-child(3)"
-		we, err = page.Timeout(to).Element(sel)
-		ex(slide, err)
-		ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
-		time.Sleep(ms)
+		page.Timeout(to).MustElement(sel).MustClick()
 	}
 
 	tit = "Файл"
 	sel = "button.addFilesBtn_RvX"
-	we, err = page.Timeout(to).Element(sel)
-	ex(slide, err)
-	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
+	page.Timeout(to).MustElement(sel).MustClick()
 	time.Sleep(ms * 2)
 	sel = "button.align-left_-232488494:nth-child(3)"
-	we, err = page.Timeout(to).Element(sel)
-	ex(slide, err)
-	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
-	time.Sleep(ms)
-	upload = true
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	page.Timeout(to).MustElement(sel).MustClick()
+	// upload = true
 
 	sel = "input[type=file]"
-	files := []string{filepath.Join(root, mov)}
-	stdo.Println(files)
-	we, err = page.Timeout(to).Element(sel)
-	ex(slide, err)
-	ex(slide, we.SetFiles(files))
-	time.Sleep(ms)
+	page.Timeout(to).MustElement(sel).MustSetFiles(filepath.Join(root, mov))
 
-	tit = "Загрузка"
-	sel = fmt.Sprintf("//*[contains(text(),%q)]", tit)
-	_, err = page.Timeout(sec * 3).ElementX(sel)
-	stdo.Println(tit, err)
+	tit = "Загрузка контента"
+	sel = "div"
+	_, err = page.Timeout(sec*3).ElementR(sel, tit)
 	if err != nil {
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ началась"))
-		Scanln()
-		return
+		tit = "загрузка не началась"
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		ex(slide, fmt.Errorf(tit))
 	}
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	// stdo.Println(we.MustHTML())
 
 	tit = "отменена"
-	sel = fmt.Sprintf("//*[contains(text(),%q)]", tit)
-	_, err = page.Timeout(sec * 3).ElementX(sel)
-	stdo.Println(tit, err)
+	we, err = page.Timeout(sec*3).ElementR(sel, tit)
 	if err == nil {
+		stdo.Println(we.MustHTML())
+		tit = "загрузка отменена"
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
-		Scanln()
-		return
+		ex(slide, fmt.Errorf(tit))
 	}
 
-	tit = "завершена"
-	sel = fmt.Sprintf("//*[contains(text(),%q)]", tit)
-	_, err = page.Timeout(to).ElementX(sel)
-	stdo.Println(tit, err)
+	tit = "Загрузка завершена"
+	_, err = page.Timeout(to).ElementR(sel, tit)
 	if err != nil {
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ завершена"))
-		Scanln()
-		return
+		tit = "загрузка не завершена"
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		ex(slide, fmt.Errorf(tit))
 	}
+	// stdo.Println(we.MustHTML())
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
-	time.Sleep(sec * 7)
+	time.Sleep(sec * 7) //обработка
 
 	tit = "Сохранить и закрыть"
 	sel = "div.multiBtnInner_xbp:nth-child(4)"
-	we, err = page.Timeout(to).Element(sel)
-	ex(slide, err)
-	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
+	page.Timeout(to).MustElement(sel).MustClick()
 	time.Sleep(sec)
-	scs(slide, deb, page, fmt.Sprintf("%02d.png", slide))
+	scs(slide, slide, page, fmt.Sprintf("%02d.png", slide))
 }
