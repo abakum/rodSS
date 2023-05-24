@@ -156,7 +156,7 @@ func main() {
 		deb = de
 		stdo.Println(deb)
 		go start(s01, 1, &wg, started)
-		// go start(s04, 4, &wg, started)
+		go start(s04, 4, &wg, started)
 		// go start(s05, 5, &wg, started)
 		// go start(s08, 8, &wg, started)
 		// go start(s12, 12, &wg, started)
