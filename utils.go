@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -108,7 +107,7 @@ func clip(X, Y, Width, Height float64) *proto.PageViewport {
 	return &clip
 }
 
-func scs(slide int, page *rod.Page, fn string) {
+func scs(slide, deb int, page *rod.Page, fn string) {
 	stdo.Println(src(8), fn)
 	if deb != slide {
 		return
@@ -119,23 +118,6 @@ func scs(slide int, page *rod.Page, fn string) {
 	}
 }
 
-func chrom() (b *rod.Browser, f func()) {
-	if multiBrowser {
-		ctTab, caTab := context.WithCancel(ctRoot)
-		b = rod.New().ControlURL(launch().
-			MustLaunch(),
-		).MustConnect().
-			Context(ctTab)
-		f = func() {
-			caTab()
-			b.Close()
-		}
-	} else {
-		b = browser
-		f = func() {}
-	}
-	return
-}
 func chrome() (b *rod.Browser, f func() error) {
 	if multiBrowser {
 		b = rod.New().ControlURL(launch().
@@ -174,7 +156,7 @@ func Scanln() {
 	stdo.Print(src(8), "\nPress Enter>")
 	fmt.Scanln()
 }
-func start(fu func(slide int), slide int, wg *sync.WaitGroup, started chan bool) {
+func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan bool) {
 	switch deb {
 	case 0, slide, -slide:
 	default:
@@ -187,10 +169,9 @@ func start(fu func(slide int), slide int, wg *sync.WaitGroup, started chan bool)
 		}
 		defer wg.Done()
 	}
-	fu(slide)
-}
-func done(slide int) {
-	stdo.Printf("%02d Done\n", slide)
+	fu(slide, deb)
+	stdo.Printf("%s %02d Done\n", src(8), slide)
+
 }
 
 func abs(i int) int {
@@ -199,11 +180,12 @@ func abs(i int) int {
 	}
 	return -i
 }
-func autoStart(started chan bool, d time.Duration) {
+func autoStart(started chan bool, d time.Duration) *time.Timer {
 	for len(started) > 0 {
 		<-started
 	}
-	time.AfterFunc(d, func() {
+	return time.AfterFunc(d, func() {
+		stdo.Println("auto started")
 		started <- true
 	})
 }
@@ -222,6 +204,7 @@ func launch() (l *launcher.Launcher) {
 			Headless(false).
 			Logger(stdo.Writer())
 	}
+	time.Sleep(sec)
 	return
 }
 func WaitElementsLessThan(p *rod.Page, selector string, num int) error {

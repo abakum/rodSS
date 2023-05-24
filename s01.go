@@ -9,7 +9,7 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func s01(slide int) {
+func s01(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 		wp     = true
@@ -24,19 +24,22 @@ func s01(slide int) {
 	browser, ca := chrome()
 	defer ca()
 	if wp {
-		page = browser.WithPanic(exp).MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).MustNavigate(params[0])
+		page = browser.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
 		defer page.Close()
-		we = page.Timeout(sec).MustElement("div > table.weather")
+		page.Navigate(params[0])
+		we = page.WithPanic(exp).Timeout(to).MustElement("div > table.weather").WithPanic(exp)
 	} else {
 		page, err = browser.Page(proto.TargetCreateTarget{})
 		ex(slide, err)
-		ex(slide, page.MustSetViewport(1920, 1080, 1, false).Navigate(params[0]))
-		we, err = page.Timeout(sec).Element("div > table.weather")
+		defer page.Close()
+		page = page.MustSetViewport(1920, 1080, 1, false)
+		defer page.Close()
+		page.Navigate(params[0])
+		we, err = page.Timeout(to).Element("div > table.weather")
 		ex(slide, err)
 	}
-	time.Sleep(sec)
+	time.Sleep(ms)
 	bytes, err := we.Screenshot(proto.PageCaptureScreenshotFormatJpeg, 99)
 	ex(slide, err)
 	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
-	done(slide)
 }

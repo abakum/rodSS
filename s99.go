@@ -11,7 +11,7 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func s99(slide int) {
+func s99(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 		err    error
@@ -47,14 +47,14 @@ func s99(slide int) {
 		time.Sleep(sec)
 	}
 	ex(slide, err)
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	if tit == "Авторизация" {
 		tit = "ar-user-name"
 		ex(slide, we.Input(params[1]))
 		ex(slide, page.Keyboard.Press(input.Enter))
 		time.Sleep(ms)
-		scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 		tit = "ar-user-password"
 		sel = fmt.Sprintf("input[name=%q]", tit)
 		we, err = page.Timeout(to).Element(sel)
@@ -62,14 +62,14 @@ func s99(slide int) {
 		ex(slide, we.Input(params[2]))
 		ex(slide, page.Keyboard.Press(input.Enter))
 		time.Sleep(ms)
-		scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 		we, err = page.Timeout(to).Element(se)
 		ex(slide, err)
 	}
 	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
 	time.Sleep(ms)
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Удалить"
 	sel = "button.menu-button_J9B"
@@ -97,7 +97,7 @@ func s99(slide int) {
 	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
 	time.Sleep(ms)
 	upload = true
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	sel = "input[type=file]"
 	files := []string{filepath.Join(root, mov)}
@@ -112,18 +112,18 @@ func s99(slide int) {
 	_, err = page.Timeout(sec * 3).ElementX(sel)
 	stdo.Println(tit, err)
 	if err != nil {
-		scs(slide, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ началась"))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ началась"))
 		Scanln()
 		return
 	}
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "отменена"
 	sel = fmt.Sprintf("//*[contains(text(),%q)]", tit)
 	_, err = page.Timeout(sec * 3).ElementX(sel)
 	stdo.Println(tit, err)
 	if err == nil {
-		scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 		Scanln()
 		return
 	}
@@ -133,11 +133,11 @@ func s99(slide int) {
 	_, err = page.Timeout(to).ElementX(sel)
 	stdo.Println(tit, err)
 	if err != nil {
-		scs(slide, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ завершена"))
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, "Загрузка НЕ завершена"))
 		Scanln()
 		return
 	}
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 	time.Sleep(sec * 7)
 
 	tit = "Сохранить и закрыть"
@@ -146,6 +146,5 @@ func s99(slide int) {
 	ex(slide, err)
 	ex(slide, we.Click(proto.InputMouseButtonLeft, 1))
 	time.Sleep(sec)
-	scs(deb, page, fmt.Sprintf("%02d.png", slide))
-	done(slide)
+	scs(slide, deb, page, fmt.Sprintf("%02d.png", slide))
 }

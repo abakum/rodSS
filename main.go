@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	deb          int
+	// deb          int
 	stdo         *log.Logger
 	cd           string // s:\bin
 	root         string // s:
@@ -74,21 +74,20 @@ func main() {
 		switch i {
 		case 0:
 			multiBrowser = false
-			continue
 		case 2, -2:
-			continue
 		case 3, -3:
 			sequentially = true
-			continue
 		case 14:
 			slides = []int{1, 4, 5, 8, 12, 13}
 		case -14:
 			slides = []int{-1, -4, -5, -8, -12, -13}
+		case 100:
+			slides = []int{97, 98, 99}
+		case -100:
+			slides = []int{-97, -98, -99}
+		default:
+			slides = append(slides, i)
 		}
-		if abs(i) == 14 {
-			break
-		}
-		slides = append(slides, i)
 	}
 	//""  mb 1 hl 1 debug 0
 	//"0" mb 0 hl x debug 0
@@ -117,8 +116,6 @@ func main() {
 	sc = conf.P["4"][1]
 	rf = conf.P["12"][2]
 	if !multiBrowser {
-		// in multitab mode with one browser instance some tab has hang
-		// regardless of chrome://flags/#high-efficiency-mode-available
 		browser = rod.New().ControlURL(launch().
 			UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
 			MustLaunch(),
@@ -126,7 +123,6 @@ func main() {
 			Context(ctRoot)
 	}
 	closer.Bind(func() {
-		deb = 2 //exit
 		caRoot()
 		if !multiBrowser {
 			browser.Close()
@@ -147,41 +143,48 @@ func main() {
 		os.Exit(exit)
 	})
 	started := make(chan bool, 10)
-	autoStart(started, sec) //for wg.Add
+	st := autoStart(started, sec)
 	stdo.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially)
 	for _, de := range slides {
 		if abs(de) > 13 {
 			break
 		}
-		deb = de
-		stdo.Println(deb)
-		go start(s01, 1, &wg, started)
-		go start(s04, 4, &wg, started)
-		// go start(s05, 5, &wg, started)
-		// go start(s08, 8, &wg, started)
-		// go start(s12, 12, &wg, started)
-		// go start(s13, 13, &wg, started)
+		stdo.Println(de)
+		go start(s01, 1, de, &wg, started)
+		go start(s04, 4, de, &wg, started)
+		go start(s05, 5, de, &wg, started)
+		// go start(s08, 8, de, &wg, started)
+		go start(s12, 12, de, &wg, started)
+		go start(s13, 13, de, &wg, started)
 		if sequentially {
-			<-started               //first started
-			wg.Wait()               //all done
-			autoStart(started, sec) //no one started
+			<-started
+			st.Stop()
+			stdo.Printf("%02d started", de)
+			wg.Wait()
+			stdo.Printf("%02d done", de)
+			st = autoStart(started, sec)
 		}
 	}
 	if !sequentially {
-		<-started //first started
-		wg.Wait() //all done
+		<-started
+		st.Stop()
+		stdo.Println("one started")
+		wg.Wait()
+		stdo.Println("all done")
 	}
 	for _, de := range slides {
 		if de != 0 && abs(de) < 97 {
 			continue
 		}
-		deb = de
-		stdo.Println(deb)
-		// start(s97, 97, nil, nil)        //bat jpgs to mov
-		autoStart(started, sec) //no one started
-		// go start(s98, 98, &wg, started) //telegram
-		go start(s99, 99, &wg, started) //ss
-		<-started                       //first started
-		wg.Wait()                       //all done
+		stdo.Println(de)
+		start(s97, 97, de, nil, nil)        //bat jpgs to mov
+		st = autoStart(started, sec)        //no one started
+		go start(s98, 98, de, &wg, started) //telegram
+		go start(s99, 99, de, &wg, started) //ss
+		<-started
+		st.Stop()
+		stdo.Println("one started")
+		wg.Wait()
+		stdo.Println("all done")
 	}
 }

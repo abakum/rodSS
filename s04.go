@@ -10,12 +10,11 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func s04(slide int) {
+func s04(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 		imageBackground,
 		visualContainerHost proto.PageViewport
-		tit string
 	)
 	stdo.Println(params)
 	exp := func(x interface{}) {
@@ -28,13 +27,16 @@ func s04(slide int) {
 	page.Navigate(params[0])
 	time.Sleep(sec)
 	page = page.WithPanic(exp).MustWaitLoad()
-	tit = page.MustInfo().Title
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	tit := page.MustInfo().Title
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
-	cb(slide, page, "СЦ")
+	cb(slide, deb, page, "СЦ")
 
-	ex(slide, getClientRect(page.MustElement("div.imageBackground"), &imageBackground))
-	ex(slide, getClientRect(page.MustElement("div.visualContainerHost"), &visualContainerHost))
+	sel := "div.imageBackground"
+	ex(slide, getClientRect(page.MustElement(sel), &imageBackground))
+
+	sel = "div.visualContainerHost"
+	ex(slide, getClientRect(page.MustElement(sel), &visualContainerHost))
 
 	bytes, err := page.Screenshot(false, &proto.PageCaptureScreenshot{
 		Format: proto.PageCaptureScreenshotFormatJpeg,
@@ -47,27 +49,26 @@ func s04(slide int) {
 	})
 	ex(slide, err)
 	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
-	done(slide)
 }
 
-func cb(slide int, page *rod.Page, key string) {
+func cb(slide, deb int, page *rod.Page, key string) {
 	tit := "СЦ"
 	se := fmt.Sprintf("div[aria-label=%q] > i", key)
 	page.Timeout(to).MustElement(se).MustClick()
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Поиск"
 	sel := "div.searchHeader.show > input"
 	page.Timeout(to * 2).MustElement(sel).Input(sc)
 	page.Keyboard.Press(input.Enter)
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = sc
 	// sel = fmt.Sprintf("//span[.=%q]", tit)
 	// page.Timeout(to * 2).MustElementX(sel).MustClick()
 	page.Timeout(to*2).MustElementR("span", tit).MustClick()
 	page.Timeout(to).MustElement(se).MustClick()
-	scs(slide, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to*3), sel, 1)

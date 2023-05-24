@@ -9,7 +9,7 @@ import (
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
-func s98(slide int) {
+func s98(slide, deb int) {
 	var (
 		bot      *telego.Bot
 		file     *os.File
@@ -69,5 +69,4 @@ func s98(slide int) {
 	}
 	err = conf.saver()
 	ex(slide, err)
-	done(slide)
 }
