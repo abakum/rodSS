@@ -129,6 +129,9 @@ func chrome() (b *rod.Browser, f func() error) {
 		b = bro
 		f = func() error { return nil }
 	}
+	if !headLess {
+		b = b.SlowMotion(sec).Trace(true)
+	}
 	return
 }
 

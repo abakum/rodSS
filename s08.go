@@ -6,14 +6,15 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/input"
 )
 
 func s08(slide, deb int) {
 	var (
 		TaskClosed = "TaskClosed.xlsx"
 		params     = conf.P[strconv.Itoa(abs(slide))]
-		ok         bool
-		err        error
 	)
 	stdo.Println(params)
 	exp := func(x interface{}) {
@@ -29,41 +30,23 @@ func s08(slide, deb int) {
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "По работникам и типу задачи"
-	sel := "#login_form-username"
-	se := "span"
-	for i := 0; i < 7; i++ {
-		stdo.Println(i)
-		ok, _, err = page.Has(sel)
-		if ok {
-			tit = "Авторизация"
-			break
-		}
-		ok, _, err = page.HasR(se, tit)
-		if ok {
-			tit = "Отчеты по задачам"
-			break
-		}
-		time.Sleep(ms)
-	}
-	ex(slide, err)
+	sel := "span"
+	se := "input#login_form-username"
+	ok := false
+	page.Timeout(to).Race().Element(se).MustHandle(func(e *rod.Element) {
+		ti := "Авторизация"
+		e.MustInput(params[1])
+		se = "input#login_form-password"
+		e.Page().MustElement(se).MustInput(params[2]).MustType(input.Enter)
+		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
+		ok = true
+	}).ElementR(sel, tit).MustHandle(func(e *rod.Element) {
+		ok = true
+	}).MustDo()
 	if !ok {
 		ex(slide, fmt.Errorf("argus error"))
 	}
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
-	if tit == "Авторизация" {
-		page.Timeout(to).MustElement(sel).MustInput(params[1])
-		sel = "#login_form-password"
-		page.Timeout(to).MustElement(sel).MustInput(params[2])
-
-		tit = "Войти"
-		sel = "span"
-		page.Timeout(to).MustElementR(sel, tit).MustClick()
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
-	}
-
-	tit = "По работникам и типу задачи"
-	sel = "span"
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
@@ -93,7 +76,6 @@ func s08(slide, deb int) {
 
 	tit = "ОК"
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
-
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	sel = "span.ui-chkbox-label"
