@@ -21,15 +21,15 @@ func s01(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	browser, ca := chrome()
+	br, ca := chrome()
 	defer ca()
 	if wp {
-		page = browser.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
+		page = br.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
 		defer page.Close()
 		page.Navigate(params[0])
 		we = page.WithPanic(exp).Timeout(to).MustElement("div > table.weather").WithPanic(exp)
 	} else {
-		page, err = browser.Page(proto.TargetCreateTarget{})
+		page, err = br.Page(proto.TargetCreateTarget{})
 		ex(slide, err)
 		defer page.Close()
 		page = page.MustSetViewport(1920, 1080, 1, false)

@@ -39,7 +39,7 @@ var (
 	headLess     = true
 	// upload       = false
 	sequentially = false
-	browser      *rod.Browser
+	bro          *rod.Browser
 	chromeBin    string
 )
 
@@ -116,7 +116,7 @@ func main() {
 	sc = conf.P["4"][1]
 	rf = conf.P["12"][2]
 	if !multiBrowser {
-		browser = rod.New().ControlURL(launch().
+		bro = rod.New().ControlURL(launch().
 			UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
 			MustLaunch(),
 		).MustConnect().
@@ -125,7 +125,7 @@ func main() {
 	closer.Bind(func() {
 		caRoot()
 		if !multiBrowser {
-			browser.Close()
+			bro.Close()
 		}
 		// if upload {
 		// 	taskKill("/fi", "windowtitle eq Открытие")
@@ -153,7 +153,7 @@ func main() {
 		go start(s01, 1, de, &wg, started)
 		go start(s04, 4, de, &wg, started)
 		go start(s05, 5, de, &wg, started)
-		// go start(s08, 8, de, &wg, started)
+		go start(s08, 8, de, &wg, started)
 		go start(s12, 12, de, &wg, started)
 		go start(s13, 13, de, &wg, started)
 		if sequentially {
@@ -177,14 +177,14 @@ func main() {
 			continue
 		}
 		stdo.Println(de)
-		// start(s97, 97, de, nil, nil)        //bat jpgs to mov
-		st = autoStart(started, sec) //no one started
-		// go start(s98, 98, de, &wg, started) //telegram
+		start(s97, 97, de, nil, nil)        //bat jpgs to mov
+		st = autoStart(started, sec)        //no one started
+		go start(s98, 98, de, &wg, started) //telegram
 		go start(s99, 99, de, &wg, started) //ss
 		<-started
 		st.Stop()
-		stdo.Println("one started")
+		stdo.Println("one publication started")
 		wg.Wait()
-		stdo.Println("all done")
+		stdo.Println("all publication done")
 	}
 }

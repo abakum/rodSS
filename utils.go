@@ -126,7 +126,7 @@ func chrome() (b *rod.Browser, f func() error) {
 			Context(ctRoot)
 		f = b.Close
 	} else {
-		b = browser
+		b = bro
 		f = func() error { return nil }
 	}
 	return

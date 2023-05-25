@@ -21,9 +21,9 @@ func s99(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	browser, ca := chrome()
+	br, ca := chrome()
 	defer ca()
-	page := browser.WithPanic(exp).
+	page := br.WithPanic(exp).
 		MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
 		MustNavigate(params[0]).MustWaitLoad()
 	defer page.Close()
@@ -45,9 +45,12 @@ func s99(slide, deb int) {
 			tit = "Кампания"
 			break
 		}
-		time.Sleep(sec)
+		time.Sleep(sec * 2)
 	}
 	ex(slide, err)
+	if !ok {
+		ex(slide, fmt.Errorf("ss error"))
+	}
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	if tit == "Авторизация" {

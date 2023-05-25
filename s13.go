@@ -16,9 +16,9 @@ func s13(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	browser, ca := chrome()
+	br, ca := chrome()
 	defer ca()
-	page := browser.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
+	page := br.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
 	defer page.Close()
 	page.Navigate(params[0])
 	time.Sleep(sec)
@@ -73,6 +73,5 @@ func s13(slide, deb int) {
 	sel = "div.visualContainerHost"
 	bytes, err := page.Timeout(to).MustElement(sel).Screenshot(proto.PageCaptureScreenshotFormatJpeg, 99)
 	ex(slide, err)
-
 	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
 }
