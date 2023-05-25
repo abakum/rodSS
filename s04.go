@@ -64,9 +64,8 @@ func cb(slide, deb int, page *rod.Page, key string) {
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = sc
-	// sel = fmt.Sprintf("//span[.=%q]", tit)
-	// page.Timeout(to * 2).MustElementX(sel).MustClick()
-	page.Timeout(to*2).MustElementR("span", tit).MustClick()
+	sel = "span"
+	page.Timeout(to*2).MustElementR(sel, tit).MustClick()
 	page.Timeout(to).MustElement(se).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
