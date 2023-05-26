@@ -112,8 +112,12 @@ func main() {
 	}
 	sc = conf.P["4"][1]
 	rf = conf.P["12"][2]
+
 	if !multiBrowser {
 		bro = rod.New().
+			WithPanic(func(x interface{}) {
+				e(2, 14, x.(error))
+			}).
 			ControlURL(launch().
 				UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
 				MustLaunch(),

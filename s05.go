@@ -19,14 +19,13 @@ func s05(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	br, ca := chrome()
+	br, ca := chrome(slide)
 	defer ca()
-	page := br.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
-	defer page.Close()
+	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)
-	page = page.WithPanic(exp).MustWaitLoad()
-	tit := page.MustInfo().Title
+	tit := page.MustWaitLoad().MustInfo().Title
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Статистика по сотрудникам"

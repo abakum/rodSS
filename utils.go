@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"strings"
 	"sync"
@@ -50,6 +51,7 @@ func ex(slide int, err error) {
 		stdo.Println(src(8), err.Error())
 		Scanln()
 		closer.Close()
+		runtime.Goexit()
 	}
 }
 func e(slide int, level int, err error) {
@@ -58,6 +60,7 @@ func e(slide int, level int, err error) {
 		stdo.Println(src(level), err.Error())
 		Scanln()
 		closer.Close()
+		runtime.Goexit()
 	}
 }
 
@@ -136,9 +139,12 @@ func launch() (l *launcher.Launcher) {
 	return
 }
 
-func chrome() (b *rod.Browser, f func()) {
+func chrome(slide int) (b *rod.Browser, f func()) {
 	if multiBrowser {
 		b = rod.New().
+			WithPanic(func(x interface{}) {
+				e(slide, 14, x.(error))
+			}).
 			ControlURL(launch().
 				MustLaunch(),
 			).MustConnect().

@@ -20,14 +20,13 @@ func s04(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	br, ca := chrome()
+	br, ca := chrome(slide)
 	defer ca()
-	page := br.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
-	defer page.Close()
+	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)
-	page = page.WithPanic(exp).MustWaitLoad()
-	tit := page.MustInfo().Title
+	tit := page.MustWaitLoad().MustInfo().Title
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	cb(slide, deb, page, "СЦ")
@@ -53,12 +52,12 @@ func s04(slide, deb int) {
 
 func cb(slide, deb int, page *rod.Page, key string) {
 	tit := "СЦ"
-	se := fmt.Sprintf("div[aria-label=%q] > i", key)
-	page.Timeout(to).MustElement(se).MustClick()
+	sel := fmt.Sprintf("div[aria-label=%q] > i", key)
+	page.Timeout(to).MustElement(sel).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Поиск"
-	sel := "div.searchHeader.show > input"
+	sel = "div.searchHeader.show > input"
 	page.Timeout(to * 2).MustElement(sel).Input(sc)
 	page.Keyboard.Press(input.Enter)
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
@@ -66,7 +65,8 @@ func cb(slide, deb int, page *rod.Page, key string) {
 	tit = sc
 	sel = "span"
 	page.Timeout(to*2).MustElementR(sel, tit).MustClick()
-	page.Timeout(to).MustElement(se).MustClick()
+	page.Keyboard.MustType(input.Tab)
+	// page.Timeout(to).MustElement(se).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	sel = "div.circle"

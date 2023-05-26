@@ -21,21 +21,21 @@ func s01(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	br, ca := chrome()
+	br, ca := chrome(slide)
 	defer ca()
+	// params[0] = "http://ya.ru"
 	if wp {
-		page = br.WithPanic(exp).MustPage().MustSetViewport(1920, 1080, 1, false)
-		defer page.Close()
+		page = br.MustPage().MustSetViewport(1920, 1080, 1, false)
+		defer page.MustClose()
 		page.Navigate(params[0])
-		we = page.WithPanic(exp).Timeout(to).MustElement("div > table.weather").WithPanic(exp)
+		we = page.WithPanic(exp).Timeout(sec * 3).MustElement("div > table.weather")
 	} else {
 		page, err = br.Page(proto.TargetCreateTarget{})
 		ex(slide, err)
 		defer page.Close()
 		page = page.MustSetViewport(1920, 1080, 1, false)
-		defer page.Close()
 		page.Navigate(params[0])
-		we, err = page.Timeout(to).Element("div > table.weather")
+		we, err = page.Timeout(sec * 3).Element("div > table.weather")
 		ex(slide, err)
 	}
 	time.Sleep(ms)

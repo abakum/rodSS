@@ -20,12 +20,11 @@ func s08(slide, deb int) {
 	exp := func(x interface{}) {
 		e(slide, 14, x.(error))
 	}
-	br, ca := chrome()
+	br, ca := chrome(slide)
 	defer ca()
-	page := br.WithPanic(exp).
-		MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
+	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
 		MustNavigate(params[0]).MustWaitLoad()
-	defer page.Close()
+	defer page.MustClose()
 	tit := page.MustInfo().Title
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
