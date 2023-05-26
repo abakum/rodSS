@@ -63,7 +63,7 @@ func s99(slide, deb int) {
 	tit = "Файл"
 	sel = "button.addFilesBtn_RvX"
 	page.Timeout(to).MustElement(sel).MustClick()
-	// time.Sleep(ms)
+	time.Sleep(ms)
 	sel = "button.align-left_-232488494:nth-child(3)"
 	page.Timeout(to).MustElement(sel).MustClick()
 
