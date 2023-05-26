@@ -40,7 +40,8 @@ func (i ss) write(fileName string) {
 	}
 	// exec.Command("rundll32", "url.dll,FileProtocolHandler", fullName).Run()
 	exec.Command("cmd", "/c", "start", "chrome", fullName).Run()
-	// stdo.Println(src(8), fullName)
+	// exec.Command(chromeBin, fullName).Run() not closed
+
 }
 
 func ex(slide int, err error) {
@@ -117,17 +118,35 @@ func scs(slide, deb int, page *rod.Page, fn string) {
 		ss(bytes).write(fn)
 	}
 }
+func launch() (l *launcher.Launcher) {
+	//.NewUserMode()
+	l = launcher.New().
+		Leakless(false). //panic: open C:\Users\user\AppData\Local\Temp\leakless-0c3354cd58f0813bb5b34ddf3a7c16ed\leakless.exe: Access is denied.
+		Bin(chromeBin).
+		Delete("enable-automation").
+		Set("start-maximized")
+	if headLess {
+		l = l.
+			Set("headless", "new")
+	} else {
+		l = l.
+			Headless(false).
+			Logger(stdo.Writer())
+	}
+	return
+}
 
-func chrome() (b *rod.Browser, f func() error) {
+func chrome() (b *rod.Browser, f func()) {
 	if multiBrowser {
-		b = rod.New().ControlURL(launch().
-			MustLaunch(),
-		).MustConnect().
+		b = rod.New().
+			ControlURL(launch().
+				MustLaunch(),
+			).MustConnect().
 			Context(ctRoot)
-		f = b.Close
+		f = b.MustClose
 	} else {
 		b = bro
-		f = func() error { return nil }
+		f = func() {}
 	}
 	if !headLess {
 		b = b.SlowMotion(sec).Trace(true)
@@ -159,7 +178,7 @@ func Scanln() {
 	stdo.Print(src(8), "\nPress Enter>")
 	fmt.Scanln()
 }
-func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan bool) {
+func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan int) {
 	switch deb {
 	case 0, slide, -slide:
 	default:
@@ -168,7 +187,7 @@ func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started 
 	if wg != nil {
 		wg.Add(1)
 		if started != nil {
-			started <- true
+			started <- slide
 		}
 		defer wg.Done()
 	}
@@ -183,33 +202,23 @@ func abs(i int) int {
 	}
 	return -i
 }
-func autoStart(started chan bool, d time.Duration) *time.Timer {
+func autoStart(started chan int, d time.Duration) *time.Timer {
 	for len(started) > 0 {
 		<-started
 	}
 	return time.AfterFunc(d, func() {
 		stdo.Println("auto started")
-		started <- true
+		started <- 0
 	})
 }
 
-func launch() (l *launcher.Launcher) {
-	l = launcher.New().
-		Leakless(false). //panic: open C:\Users\user\AppData\Local\Temp\leakless-0c3354cd58f0813bb5b34ddf3a7c16ed\leakless.exe: Access is denied.
-		Bin(chromeBin).
-		Delete("enable-automation").
-		Set("start-maximized")
-	if headLess {
-		l = l.
-			Set("headless", "new")
-	} else {
-		l = l.
-			Headless(false).
-			Logger(stdo.Writer())
-	}
-	time.Sleep(sec)
-	return
-}
 func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
 	return p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
+}
+func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
+	i := <-started
+	st.Stop()
+	stdo.Printf("s%02d %s", i, "started")
+	wg.Wait()
+	stdo.Println("all done")
 }

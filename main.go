@@ -26,7 +26,6 @@ const (
 )
 
 var (
-	// deb          int
 	stdo         *log.Logger
 	cd           string // s:\bin
 	root         string // s:
@@ -37,7 +36,6 @@ var (
 	caRoot       context.CancelFunc
 	multiBrowser = true
 	headLess     = true
-	// upload       = false
 	sequentially = false
 	bro          *rod.Browser
 	chromeBin    string
@@ -102,7 +100,6 @@ func main() {
 	if !ok {
 		ex(2, fmt.Errorf("not found chromeBin"))
 	}
-	stdo.Println(chromeBin)
 	exeN, exeF, err := exeFN()
 	ex(2, err)
 	conf, err = loader(filepath.Join(cd, exeF+".json"))
@@ -116,20 +113,18 @@ func main() {
 	sc = conf.P["4"][1]
 	rf = conf.P["12"][2]
 	if !multiBrowser {
-		bro = rod.New().ControlURL(launch().
-			UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
-			MustLaunch(),
-		).MustConnect().
+		bro = rod.New().
+			ControlURL(launch().
+				UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
+				MustLaunch(),
+			).MustConnect().
 			Context(ctRoot)
 	}
 	closer.Bind(func() {
 		caRoot()
 		if !multiBrowser {
-			bro.Close()
+			bro.MustClose()
 		}
-		// if upload {
-		// 	taskKill("/fi", "windowtitle eq Открытие")
-		// }
 		stdo.Println("main Done", exit)
 		switch {
 		case exit == 0:
@@ -137,12 +132,12 @@ func main() {
 			exit = -exit
 			fallthrough
 		default:
-			time.Sleep(sec) // for caRoot
+			time.Sleep(sec)
 			taskKill("/F", "/IM", exeN, "/T")
 		}
 		os.Exit(exit)
 	})
-	started := make(chan bool, 10)
+	started := make(chan int, 10)
 	st := autoStart(started, sec)
 	stdo.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially)
 	for _, de := range slides {
@@ -157,34 +152,22 @@ func main() {
 		go start(s12, 12, de, &wg, started)
 		go start(s13, 13, de, &wg, started)
 		if sequentially {
-			<-started
-			st.Stop()
-			stdo.Printf("%02d started", de)
-			wg.Wait()
-			stdo.Printf("%02d done", de)
+			wait(st, &wg, started)
 			st = autoStart(started, sec)
 		}
 	}
 	if !sequentially {
-		<-started
-		st.Stop()
-		stdo.Println("one started")
-		wg.Wait()
-		stdo.Println("all done")
+		wait(st, &wg, started)
 	}
 	for _, de := range slides {
 		if de != 0 && abs(de) < 97 {
 			continue
 		}
 		stdo.Println(de)
-		start(s97, 97, de, nil, nil)        //bat jpgs to mov
-		st = autoStart(started, sec)        //no one started
+		start(s97, 97, de, nil, nil) //bat jpgs to mov
+		st = autoStart(started, sec)
 		go start(s98, 98, de, &wg, started) //telegram
 		go start(s99, 99, de, &wg, started) //ss
-		<-started
-		st.Stop()
-		stdo.Println("one publication started")
-		wg.Wait()
-		stdo.Println("all publication done")
+		wait(st, &wg, started)
 	}
 }
