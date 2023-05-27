@@ -31,20 +31,14 @@ func s08(slide, deb int) {
 	tit = "По работникам и типу задачи"
 	sel := "span"
 	se := "input#login_form-username"
-	ok := false
 	page.Timeout(to).Race().Element(se).MustHandle(func(e *rod.Element) {
 		ti := "Авторизация"
 		e.MustInput(params[1])
 		se = "input#login_form-password"
 		e.Page().MustElement(se).MustInput(params[2]).MustType(input.Enter)
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
-		ok = true
 	}).ElementR(sel, tit).MustHandle(func(e *rod.Element) {
-		ok = true
 	}).MustDo()
-	if !ok {
-		ex(slide, fmt.Errorf("argus error"))
-	}
 
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
