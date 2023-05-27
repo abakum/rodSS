@@ -39,8 +39,12 @@ func (i ss) write(fileName string) {
 	if err != nil {
 		return
 	}
-	// exec.Command("rundll32", "url.dll,FileProtocolHandler", fullName).Run()
-	exec.Command("cmd", "/c", "start", "chrome", fullName).Run()
+	if userMode {
+		exec.Command("rundll32", "url.dll,FileProtocolHandler", fullName).Run()
+		// exec.Command("cmd", "/c", "start", "browser", fullName).Run()
+	} else {
+		exec.Command("cmd", "/c", "start", "chrome", fullName).Run()
+	}
 	// exec.Command(chromeBin, fullName).Run() not closed
 
 }
@@ -122,12 +126,23 @@ func scs(slide, deb int, page *rod.Page, fn string) {
 	}
 }
 func launch() (l *launcher.Launcher) {
-	//.NewUserMode()
-	l = launcher.New().
-		Leakless(false). //panic: open C:\Users\user\AppData\Local\Temp\leakless-0c3354cd58f0813bb5b34ddf3a7c16ed\leakless.exe: Access is denied.
-		Bin(chromeBin).
+	if userMode {
+		_, exeN := filepath.Split(chromeBin)
+		taskKill("/f", "/im", exeN)
+		time.Sleep(sec)
+		l = launcher.NewUserMode()
+	} else {
+		l = launcher.New().
+			Leakless(false). //panic: open C:\Users\user\AppData\Local\Temp\leakless-0c3354cd58f0813bb5b34ddf3a7c16ed\leakless.exe: Access is denied.
+			Bin(chromeBin)
+	}
+	l = l.
 		Delete("enable-automation").
 		Set("start-maximized")
+	if !multiBrowser && !userMode {
+		l = l.
+			UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir))
+	}
 	if headLess {
 		l = l.
 			Set("headless", "new")
@@ -140,7 +155,7 @@ func launch() (l *launcher.Launcher) {
 }
 
 func chrome(slide int) (b *rod.Browser, f func()) {
-	if multiBrowser {
+	if multiBrowser || slide == 2 {
 		b = rod.New().
 			WithPanic(func(x interface{}) {
 				e(slide, 14, x.(error))
@@ -198,7 +213,7 @@ func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started 
 		defer wg.Done()
 	}
 	fu(slide, deb)
-	stdo.Printf("%s %02d Done\n", src(8), slide)
+	stdo.Printf("%s %02d done\n", src(8), slide)
 
 }
 

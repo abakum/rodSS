@@ -37,6 +37,7 @@ var (
 	multiBrowser = true
 	headLess     = true
 	sequentially = false
+	userMode     = false
 	bro          *rod.Browser
 	chromeBin    string
 )
@@ -75,6 +76,8 @@ func main() {
 		case 2, -2:
 		case 3, -3:
 			sequentially = true
+		case 6, -6:
+			userMode = true
 		case 14:
 			slides = []int{1, 4, 5, 8, 12, 13}
 		case -14:
@@ -92,6 +95,9 @@ func main() {
 	// >0 mb x hl 0 debug 1
 	// <0 mb 1 hl x debug 0
 	// 3 mb x hl x sequentially 1
+	if userMode {
+		multiBrowser = false
+	}
 	if len(slides) == 0 {
 		slides = append(slides, 0)
 	}
@@ -114,22 +120,14 @@ func main() {
 	rf = conf.P["12"][2]
 
 	if !multiBrowser {
-		bro = rod.New().
-			WithPanic(func(x interface{}) {
-				e(2, 14, x.(error))
-			}).
-			ControlURL(launch().
-				UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir)).
-				MustLaunch(),
-			).MustConnect().
-			Context(ctRoot)
+		bro, _ = chrome(2)
 	}
 	closer.Bind(func() {
 		caRoot()
 		if !multiBrowser {
 			bro.MustClose()
 		}
-		stdo.Println("main Done", exit)
+		stdo.Println("main done", exit)
 		switch {
 		case exit == 0:
 		case exit < 0:
@@ -143,7 +141,7 @@ func main() {
 	})
 	started := make(chan int, 10)
 	st := autoStart(started, sec)
-	stdo.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially)
+	stdo.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially, "userMode", userMode)
 	for _, de := range slides {
 		if abs(de) > 13 {
 			break
