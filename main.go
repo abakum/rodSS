@@ -69,6 +69,7 @@ func main() {
 		}
 		if i < 0 {
 			multiBrowser = true
+			userMode = false
 		}
 		switch i {
 		case 0:
@@ -78,6 +79,7 @@ func main() {
 			sequentially = true
 		case 6, -6:
 			userMode = true
+			multiBrowser = false
 		case 14:
 			slides = []int{1, 4, 5, 8, 12, 13}
 		case -14:
@@ -89,14 +91,6 @@ func main() {
 		default:
 			slides = append(slides, i)
 		}
-	}
-	//""  mb 1 hl 1 debug 0
-	//"0" mb 0 hl x debug 0
-	// >0 mb x hl 0 debug 1
-	// <0 mb 1 hl x debug 0
-	// 3 mb x hl x sequentially 1
-	if userMode {
-		multiBrowser = false
 	}
 	if len(slides) == 0 {
 		slides = append(slides, 0)
