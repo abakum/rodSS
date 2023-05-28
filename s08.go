@@ -29,45 +29,45 @@ func s08(slide, deb int) {
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "По работникам и типу задачи"
-	sel := "span"
-	se := "input#login_form-username"
-	page.Timeout(to).Race().Element(se).MustHandle(func(e *rod.Element) {
-		ti := "Авторизация"
+	sel := "input#login_form-username"
+	page.Timeout(to).Race().Element(sel).MustHandle(func(e *rod.Element) {
+		tit := "Авторизация"
 		e.MustInput(params[1])
-		se = "input#login_form-password"
-		e.Page().MustElement(se).MustInput(params[2]).MustType(input.Enter)
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
-	}).ElementR(sel, tit).MustHandle(func(e *rod.Element) {
+		sel = "input#login_form-password"
+		e.Page().MustElement(sel).MustInput(params[2]).MustType(input.Enter)
+		scs(slide, deb, e.Page(), fmt.Sprintf("%02d %s.png", slide, tit))
+	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 
-	page.Timeout(to).MustElementR(sel, tit).MustClick()
+	page.Timeout(to).MustSearch(tit).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "месяцы"
-	sel = "span"
-	page.Timeout(to).MustElementR(sel, tit).MustClick()
+	page.Timeout(to).MustSearch(tit).MustClick()
 
 	tit = "Обработка наряда"
 	sel = "ul.ui-widget"
 	page.Timeout(to).MustElement(sel).MustClick()
-	sel = "//li[5]/label"
-	page.Timeout(to).MustElementX(sel).MustClick()
+	// sel = "//li[5]/label"
+	// stdo.Println(page.Timeout(to).MustElementX(sel).MustHTML())
+	sel = "li > label"
+	page.Timeout(to).MustElementR(sel, tit).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
-	sel = ".ui-tree-toggler"
+	sel = "span.ui-tree-toggler"
 	for i := 4; i < 9; i++ {
 		page.Timeout(to).MustElements(sel)[i].MustClick()
 		time.Sleep(ms)
 	}
 
 	tit = "Группа инсталляций"
-	sel = "span"
-	page.Timeout(to).MustElementR(sel, tit).MustClick()
+	page.Timeout(to).MustSearch(tit).MustClick()
 
 	tit = "Группа клиентского сервиса"
-	page.Timeout(to).MustElementR(sel, tit).MustClick()
+	page.Timeout(to).MustSearch(tit).MustClick()
 
 	tit = "ОК"
+	sel = "span"
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
