@@ -24,7 +24,7 @@ func s99(slide, deb int) {
 		MustNavigate(params[0]).MustWaitLoad()
 	defer page.MustClose()
 	tit := page.MustInfo().Title
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "ar-user-name"
 	sel := fmt.Sprintf("input[name=%q]", tit)
@@ -35,7 +35,7 @@ func s99(slide, deb int) {
 			tit := "ar-user-password"
 			sel = fmt.Sprintf("input[name=%q]", tit)
 			page.Timeout(to).MustElement(sel).MustInput(params[2]).Page().Keyboard.MustType(input.Enter)
-			scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+			sdpt(slide, deb, page, tit)
 		}
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
@@ -43,7 +43,7 @@ func s99(slide, deb int) {
 	// stdo.Println(page.MustSearch(tit).MustHTML())
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(ms)
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "Удалить"
 	sel = "button.menu-button_J9B"
@@ -68,27 +68,27 @@ func s99(slide, deb int) {
 	time.Sleep(ms)
 	page.Timeout(sec * 3).WithPanic(func(x interface{}) {
 		tit = "загрузка не началась за 3 секунды"
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		sdpt(slide, deb, page, tit)
 		ex(slide, fmt.Errorf(tit))
 	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
+		sdpf(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
 		ex(slide, fmt.Errorf(ti))
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "Загрузка завершена"
 	page.Timeout(sec * 13).WithPanic(func(x interface{}) {
 		tit = "загрузка не завершилась за 13 секунды"
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		sdpt(slide, deb, page, tit)
 		ex(slide, fmt.Errorf(tit))
 	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
 		stdo.Println(page.MustSearch(ti).MustHTML())
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
+		sdpf(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
 		ex(slide, fmt.Errorf(ti))
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	// for i := 0; i < 7; i++ {
 	// 	stdo.Println(i, page.MustSearch("обр").MustHTML())
@@ -97,10 +97,10 @@ func s99(slide, deb int) {
 
 	tit = "Обработка завершена"
 	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "Сохранить и закрыть"
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(sec)
-	scs(slide, slide, page, fmt.Sprintf("%02d.png", slide))
+	sp(slide, page)
 }

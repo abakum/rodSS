@@ -26,12 +26,12 @@ func s05(slide, deb int) {
 	page.Navigate(params[0])
 	time.Sleep(sec)
 	tit := page.MustWaitLoad().MustInfo().Title
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "Статистика по сотрудникам"
 	sel := fmt.Sprintf("div[title=%q]", tit)
 	page.Timeout(to).MustElement(sel).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	cb(slide, deb, page, "СЦ/ЦЭ")
 
@@ -45,7 +45,7 @@ func s05(slide, deb int) {
 	sel = "div.visualContainerHost"
 	ex(slide, getClientRect(page.MustElement(sel), &visualContainerHost))
 
-	bytes, err := page.Screenshot(false, &proto.PageCaptureScreenshot{
+	sl(slide).done(page.Screenshot(false, &proto.PageCaptureScreenshot{
 		Format: proto.PageCaptureScreenshotFormatJpeg,
 		Clip: clip(
 			visualContainerHost.X,
@@ -53,7 +53,5 @@ func s05(slide, deb int) {
 			title.X-visualContainerHost.X,
 			innerContainer.Y+innerContainer.Height-2*visualContainerHost.Y,
 		),
-	})
-	ex(slide, err)
-	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
+	}))
 }

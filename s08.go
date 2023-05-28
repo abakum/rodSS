@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -26,7 +25,7 @@ func s08(slide, deb int) {
 		MustNavigate(params[0]).MustWaitLoad()
 	defer page.MustClose()
 	tit := page.MustInfo().Title
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "По работникам и типу задачи"
 	sel := "input#login_form-username"
@@ -35,12 +34,12 @@ func s08(slide, deb int) {
 		e.MustInput(params[1])
 		sel = "input#login_form-password"
 		e.Page().MustElement(sel).MustInput(params[2]).MustType(input.Enter)
-		scs(slide, deb, e.Page(), fmt.Sprintf("%02d %s.png", slide, tit))
+		sdpt(slide, deb, e.Page(), tit)
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 
 	page.Timeout(to).MustSearch(tit).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = "месяцы"
 	page.Timeout(to).MustSearch(tit).MustClick()
@@ -52,7 +51,7 @@ func s08(slide, deb int) {
 	// stdo.Println(page.Timeout(to).MustElementX(sel).MustHTML())
 	sel = "li > label"
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	sel = "span.ui-tree-toggler"
 	for i := 4; i < 9; i++ {
@@ -69,7 +68,7 @@ func s08(slide, deb int) {
 	tit = "ОК"
 	sel = "span"
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	sel = "span.ui-chkbox-label"
 	page.Timeout(to).MustElement(sel).MustClick()
@@ -85,7 +84,7 @@ func s08(slide, deb int) {
 	page.Timeout(to).MustElementR(sel, tit).MustClick()
 
 	ex(slide, os.WriteFile(excel, wait(), 0o644))
-	scs(slide, slide, page, fmt.Sprintf("%02d.png", slide))
+	sp(slide, page)
 
 	s09(9)
 }

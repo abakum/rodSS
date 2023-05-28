@@ -27,7 +27,7 @@ func s04(slide, deb int) {
 	page.Navigate(params[0])
 	time.Sleep(sec)
 	tit := page.MustWaitLoad().MustInfo().Title
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	cb(slide, deb, page, "СЦ")
 
@@ -37,7 +37,7 @@ func s04(slide, deb int) {
 	sel = "div.visualContainerHost"
 	ex(slide, getClientRect(page.MustElement(sel), &visualContainerHost))
 
-	bytes, err := page.Screenshot(false, &proto.PageCaptureScreenshot{
+	sl(slide).done(page.Screenshot(false, &proto.PageCaptureScreenshot{
 		Format: proto.PageCaptureScreenshotFormatJpeg,
 		Clip: clip(
 			visualContainerHost.X,
@@ -45,31 +45,29 @@ func s04(slide, deb int) {
 			imageBackground.X-visualContainerHost.X,
 			visualContainerHost.Height,
 		),
-	})
-	ex(slide, err)
-	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
+	}))
 }
 
 func cb(slide, deb int, page *rod.Page, key string) {
 	tit := "СЦ"
-	sel := fmt.Sprintf("div[aria-label=%q] > i", key)
-	page.Timeout(to).MustElement(sel).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	se := fmt.Sprintf("div[aria-label=%q] > i", key)
+	page.Timeout(to).MustElement(se).MustClick()
+	sdpt(slide, deb, page, tit)
 
 	tit = "Поиск"
-	sel = "div.searchHeader.show > input"
+	sel := "div.searchHeader.show > input"
 	page.Timeout(to * 2).MustElement(sel).Input(sc)
 	page.Keyboard.Press(input.Enter)
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	sdpt(slide, deb, page, tit)
 
 	tit = sc
 	sel = "span"
 	page.Timeout(to*2).MustElementR(sel, tit).MustClick()
-	page.Keyboard.MustType(input.Tab)
-	// page.Timeout(to).MustElement(se).MustClick()
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+	// page.Keyboard.MustType(input.Tab)
+	page.Timeout(to).MustElement(se).MustClick()
 
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to*3), sel, 1)
-	time.Sleep(sec)
+	time.Sleep(ms)
+	sdpt(slide, deb, page, tit)
 }

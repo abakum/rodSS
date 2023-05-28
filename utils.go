@@ -115,7 +115,15 @@ func clip(X, Y, Width, Height float64) *proto.PageViewport {
 	return &clip
 }
 
-func scs(slide, deb int, page *rod.Page, fn string) {
+func sdpt(slide, deb int, page *rod.Page, tit string) {
+	sdpf(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+}
+
+func sp(slide int, page *rod.Page) {
+	sdpf(slide, slide, page, fmt.Sprintf("%02d.png", slide))
+}
+
+func sdpf(slide, deb int, page *rod.Page, fn string) {
 	stdo.Println(src(8), fn)
 	if deb != slide {
 		return
@@ -245,4 +253,11 @@ func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	}
 	wg.Wait()
 	stdo.Println("all done")
+}
+
+type sl int
+
+func (slide sl) done(bytes []byte, err error) {
+	ex(int(slide), err)
+	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
 }
