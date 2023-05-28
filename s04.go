@@ -17,12 +17,9 @@ func s04(slide, deb int) {
 		visualContainerHost proto.PageViewport
 	)
 	stdo.Println(params)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	page := chromePage(br, slide)
 	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)
@@ -68,6 +65,6 @@ func cb(slide, deb int, page *rod.Page, key string) {
 
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to*3), sel, 1)
-	time.Sleep(ms)
+	// time.Sleep(ms)
 	sdpt(slide, deb, page, tit)
 }

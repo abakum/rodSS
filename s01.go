@@ -16,15 +16,12 @@ func s01(slide, deb int) {
 		err    error
 	)
 	stdo.Println(params)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	// params[0] = "http://ya.ru"
+	params[0] = "http://ya.ru"
 	sel := "div > table.weather"
 	if wp {
-		page = br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+		page = chromePage(br, slide)
 		defer page.MustClose()
 		page.Navigate(params[0])
 		sl(slide).done(page.Timeout(sec*3).MustElement(sel).
@@ -33,7 +30,7 @@ func s01(slide, deb int) {
 		page, err = br.Page(proto.TargetCreateTarget{})
 		ex(slide, err)
 		defer page.Close()
-		page = page.MustSetViewport(1920, 1080, 1, false)
+		page.MustSetViewport(1920, 1080, 1, false)
 		page.Navigate(params[0])
 		we, err = page.Timeout(sec * 3).Element(sel)
 		ex(slide, err)

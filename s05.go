@@ -16,12 +16,9 @@ func s05(slide, deb int) {
 		visualContainerHost proto.PageViewport
 	)
 	stdo.Println(params, sc)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	page := chromePage(br, slide)
 	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)

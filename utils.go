@@ -41,11 +41,11 @@ func (i ss) write(fileName string) {
 	}
 	if userMode {
 		exec.Command("rundll32", "url.dll,FileProtocolHandler", fullName).Run()
-		// exec.Command("cmd", "/c", "start", "browser", fullName).Run()
+		// exec.Command("cmd", "/c", "start", "browser", fullName).Run() //for yandex browser
 	} else {
 		exec.Command("cmd", "/c", "start", "chrome", fullName).Run()
 	}
-	// exec.Command(chromeBin, fullName).Run() not closed
+	// exec.Command(chromeBin, fullName).Run() //not closed
 
 }
 
@@ -124,7 +124,7 @@ func sp(slide int, page *rod.Page) {
 }
 
 func sdpf(slide, deb int, page *rod.Page, fn string) {
-	stdo.Println(src(8), fn)
+	stdo.Println(src(10), fn)
 	if deb != slide {
 		return
 	}
@@ -241,7 +241,10 @@ func autoStart(started chan int, d time.Duration) *time.Timer {
 }
 
 func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
-	return p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
+	stdo.Println(p.Has(selector))
+	err := p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
+	stdo.Println(p.Has(selector))
+	return err
 }
 func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	i := <-started
@@ -260,4 +263,14 @@ type sl int
 func (slide sl) done(bytes []byte, err error) {
 	ex(int(slide), err)
 	ss(bytes).write(fmt.Sprintf("%02d.jpg", slide))
+}
+
+func chromePage(br *rod.Browser, slide int) (page *rod.Page) {
+	page = br.MustPage().WithPanic(func(x interface{}) {
+		e(slide, 14, x.(error))
+	}).MustSetViewport(1920, 1080, 1, false)
+	if headLess {
+		return
+	}
+	return page.MustWindowFullscreen()
 }

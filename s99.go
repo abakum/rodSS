@@ -15,12 +15,9 @@ func s99(slide, deb int) {
 		params = conf.P[strconv.Itoa(abs(slide))]
 	)
 	stdo.Println(params)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
+	page := chromePage(br, slide).
 		MustNavigate(params[0]).MustWaitLoad()
 	defer page.MustClose()
 	tit := page.MustInfo().Title
@@ -96,7 +93,7 @@ func s99(slide, deb int) {
 	// }
 
 	tit = "Обработка завершена"
-	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
+	WaitElementsLessThan(page.Timeout(sec*13), sel, 1)
 	sdpt(slide, deb, page, tit)
 
 	tit = "Сохранить и закрыть"

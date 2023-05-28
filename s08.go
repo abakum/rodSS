@@ -16,12 +16,9 @@ func s08(slide, deb int) {
 		params     = conf.P[strconv.Itoa(abs(slide))]
 	)
 	stdo.Println(params)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false).
+	page := chromePage(br, slide).
 		MustNavigate(params[0]).MustWaitLoad()
 	defer page.MustClose()
 	tit := page.MustInfo().Title

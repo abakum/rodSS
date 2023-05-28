@@ -16,12 +16,9 @@ func s12(slide, deb int) {
 		vcHost proto.PageViewport
 	)
 	stdo.Println(params, sc)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	page := chromePage(br, slide)
 	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)
@@ -56,10 +53,8 @@ func s12(slide, deb int) {
 	page.Timeout(to).MustElement(sel).MustClick()
 	sdpt(slide, deb, page, tit)
 
-	tit = "circle"
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to), sel, 1)
-	sdpt(slide, deb, page, tit)
 
 	sel = "//*[@id='pvExplorationHost']/div/div/exploration/div/explore-canvas/div/div[2]/div/div[2]/div[2]/visual-container-repeat/visual-container[27]/transform/div/div[3]/div/visual-modern/div/div/div[2]/div[1]/div[3]/div/div[2]"
 	ex(slide, getClientRect(page.MustElementX(sel), &vc27))

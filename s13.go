@@ -13,12 +13,9 @@ func s13(slide, deb int) {
 		params = conf.P[strconv.Itoa(abs(slide))]
 	)
 	stdo.Println(params, sc, rf)
-	exp := func(x interface{}) {
-		e(slide, 14, x.(error))
-	}
 	br, ca := chrome(slide)
 	defer ca()
-	page := br.MustPage().WithPanic(exp).MustSetViewport(1920, 1080, 1, false)
+	page := chromePage(br, slide)
 	defer page.MustClose()
 	page.Navigate(params[0])
 	time.Sleep(sec)
@@ -69,6 +66,9 @@ func s13(slide, deb int) {
 	sel = "div"
 	page.Timeout(to).MustElementR(sel, tit)
 	sdpt(slide, deb, page, tit)
+
+	sel = "div.circle"
+	WaitElementsLessThan(page.Timeout(to), sel, 1)
 
 	sel = "div.visualContainerHost"
 	sl(slide).done(page.Timeout(to).MustElement(sel).Screenshot(proto.PageCaptureScreenshotFormatJpeg, 99))
