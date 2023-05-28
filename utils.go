@@ -228,7 +228,6 @@ func autoStart(started chan int, d time.Duration) *time.Timer {
 		<-started
 	}
 	return time.AfterFunc(d, func() {
-		stdo.Println("auto started")
 		started <- 0
 	})
 }
@@ -239,7 +238,11 @@ func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
 func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	i := <-started
 	st.Stop()
-	stdo.Printf("s%02d %s", i, "started")
+	if i == 0 {
+		stdo.Println("auto started")
+	} else {
+		stdo.Printf("s%02d %s", i, "started")
+	}
 	wg.Wait()
 	stdo.Println("all done")
 }

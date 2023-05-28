@@ -28,19 +28,18 @@ func s99(slide, deb int) {
 
 	tit = "ar-user-name"
 	sel := fmt.Sprintf("input[name=%q]", tit)
-	se := "div.multiBtnInner_xbp" //:nth-child(1)"
+	tit = "Редактировать"
 	page.Timeout(to).Race().Element(sel).MustHandle(func(e *rod.Element) {
 		e.MustInput(params[1]).Page().Keyboard.MustType(input.Enter)
-
-		tit = "ar-user-password"
-		sel = fmt.Sprintf("input[name=%q]", tit)
-		page.Timeout(to).MustElement(sel).MustInput(params[2]).Page().Keyboard.MustType(input.Enter)
-		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
-	}).Element(se).MustHandle(func(e *rod.Element) {
+		{
+			tit := "ar-user-password"
+			sel = fmt.Sprintf("input[name=%q]", tit)
+			page.Timeout(to).MustElement(sel).MustInput(params[2]).Page().Keyboard.MustType(input.Enter)
+			scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
+		}
+	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 
-	// page.Timeout(to).MustElement(se).MustClick()
-	tit = "Редактировать"
 	// stdo.Println(page.MustSearch(tit).MustHTML())
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(ms)
@@ -50,15 +49,15 @@ func s99(slide, deb int) {
 	sel = "button.menu-button_J9B"
 	if page.MustHas(sel) {
 		page.Timeout(to).MustElement(sel).MustClick()
-		sel = "button.align-left_-232488494:nth-child(3)"
-		page.Timeout(to).MustElement(sel).MustClick()
+		sel = "button.button_-794993099"
+		page.Timeout(to).MustElementR(sel, tit).MustClick()
 	}
 	tit = "Файл"
 	sel = "button.addFilesBtn_RvX"
 	page.Timeout(to).MustElement(sel).MustClick()
 	time.Sleep(ms)
-	sel = "button.align-left_-232488494:nth-child(3)"
-	page.Timeout(to).MustElement(sel).MustClick()
+	sel = "button.button_-794993099"
+	page.Timeout(to).MustElementR(sel, tit).MustClick()
 
 	sel = "input[type=file]"
 	page.Timeout(to).MustElement(sel).MustSetFiles(filepath.Join(root, mov))
@@ -67,26 +66,27 @@ func s99(slide, deb int) {
 	ti := "Загрузка отменена"
 	sel = "div.title_-1510807907"
 	time.Sleep(ms)
-	page.Timeout(sec*3).WithPanic(func(x interface{}) {
+	page.Timeout(sec * 3).WithPanic(func(x interface{}) {
 		tit = "загрузка не началась за 3 секунды"
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 		ex(slide, fmt.Errorf(tit))
-	}).Race().ElementR(sel, ti).MustHandle(func(e *rod.Element) {
+	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
 		ex(slide, fmt.Errorf(ti))
-	}).ElementR(sel, tit).MustHandle(func(e *rod.Element) {
+	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Загрузка завершена"
-	page.Timeout(sec*13).WithPanic(func(x interface{}) {
+	page.Timeout(sec * 13).WithPanic(func(x interface{}) {
 		tit = "загрузка не завершилась за 13 секунды"
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 		ex(slide, fmt.Errorf(tit))
-	}).Race().ElementR(sel, ti).MustHandle(func(e *rod.Element) {
+	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
+		stdo.Println(page.MustSearch(ti).MustHTML())
 		scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
 		ex(slide, fmt.Errorf(ti))
-	}).ElementR(sel, tit).MustHandle(func(e *rod.Element) {
+	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
@@ -94,19 +94,12 @@ func s99(slide, deb int) {
 	// 	stdo.Println(i, page.MustSearch("обр").MustHTML())
 	// 	time.Sleep(sec)
 	// }
-	tit = "Обрабатывается"
-	sel = fmt.Sprintf("div[title=%q]", tit)
-	page.Timeout(sec * 3).Element(sel)
-	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Обработка завершена"
 	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
 	scs(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, tit))
 
 	tit = "Сохранить и закрыть"
-	// sel = "div.multiBtnInner_xbp:nth-child(4)"
-	// page.Timeout(to).MustElement(sel).MustClick()
-	// stdo.Println(page.MustSearch(tit).MustHTML())
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(sec)
 	scs(slide, slide, page, fmt.Sprintf("%02d.png", slide))
