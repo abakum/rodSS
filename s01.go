@@ -18,7 +18,7 @@ func s01(slide, deb int) {
 	stdo.Println(params)
 	br, ca := chrome(slide)
 	defer ca()
-	params[0] = "http://ya.ru"
+	// params[0] = "http://ya.ru"
 	sel := "div > table.weather"
 	if wp {
 		page = chromePage(br, slide)

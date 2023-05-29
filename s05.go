@@ -4,16 +4,11 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-
-	"github.com/go-rod/rod/lib/proto"
 )
 
 func s05(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
-		title,
-		innerContainer,
-		visualContainerHost proto.PageViewport
 	)
 	stdo.Println(params, sc)
 	br, ca := chrome(slide)
@@ -34,21 +29,14 @@ func s05(slide, deb int) {
 
 	tit = "Ср. длительность работ сотрудника за день, часы"
 	sel = fmt.Sprintf("div[title=%q]", tit)
-	ex(slide, getClientRect(page.MustElement(sel), &title))
+	t := page.MustElement(sel).MustShape().Box()
 
 	sel = "div.innerContainer"
-	ex(slide, getClientRect(page.MustElement(sel), &innerContainer))
+	ic := page.MustElement(sel).MustShape().Box()
 
 	sel = "div.visualContainerHost"
-	ex(slide, getClientRect(page.MustElement(sel), &visualContainerHost))
-
-	sl(slide).done(page.Screenshot(false, &proto.PageCaptureScreenshot{
-		Format: proto.PageCaptureScreenshotFormatJpeg,
-		Clip: clip(
-			visualContainerHost.X,
-			visualContainerHost.Y,
-			title.X-visualContainerHost.X,
-			innerContainer.Y+innerContainer.Height-2*visualContainerHost.Y,
-		),
-	}))
+	vch := page.MustElement(sel).MustShape().Box()
+	vch.Width = t.X - vch.X
+	vch.Height = ic.Y + ic.Height - 2*vch.Y
+	sl(slide).done(page.Screenshot(true, clip(vch)))
 }

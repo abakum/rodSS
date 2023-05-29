@@ -20,7 +20,7 @@ const (
 	bat         = "abaku.bat"
 	mov         = "abaku.mp4"
 	userDataDir = `Google\Chrome\User Data\Default`
-	to          = time.Minute * 3
+	to          = time.Minute * 2
 	ms          = time.Millisecond * 200
 	sec         = time.Second
 )

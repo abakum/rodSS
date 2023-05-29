@@ -16,6 +16,7 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/xlab/closer"
+	"github.com/ysmood/gson"
 )
 
 func i2p(v int) (fn string) {
@@ -77,42 +78,6 @@ func src(deep int) (s string) {
 	s = strings.Split(s, " +0x")[0]
 	_, s = path.Split(s)
 	return
-}
-
-func getClientRect(el *rod.Element, clip *proto.PageViewport) error {
-	if clip == nil {
-		return fmt.Errorf("clip cannot be nil")
-	}
-	if el == nil {
-		return fmt.Errorf("el cannot be nil")
-	}
-	// so that it won't clip the css-transformed element
-	shape, err := el.Shape()
-	if err != nil {
-		return err
-	}
-
-	box := shape.Box()
-	var Viewport proto.PageViewport
-	Viewport.X = box.X
-	Viewport.Y = box.Y
-	Viewport.Width = box.Width
-	Viewport.Height = box.Height
-	Viewport.Scale = 1
-
-	*clip = Viewport
-	return nil
-}
-
-func clip(X, Y, Width, Height float64) *proto.PageViewport {
-	clip := proto.PageViewport{
-		X:      X,
-		Y:      Y,
-		Width:  Width,
-		Height: Height,
-		Scale:  1,
-	}
-	return &clip
 }
 
 func sdpt(slide, deb int, page *rod.Page, tit string) {
@@ -246,6 +211,7 @@ func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
 	stdo.Println(p.Has(selector))
 	return err
 }
+
 func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	i := <-started
 	st.Stop()
@@ -273,4 +239,20 @@ func chromePage(br *rod.Browser, slide int) (page *rod.Page) {
 		return
 	}
 	return page.MustWindowFullscreen()
+}
+
+func clip(r *proto.DOMRect) (clip *proto.PageCaptureScreenshot) {
+	clip = &proto.PageCaptureScreenshot{
+		Format:  proto.PageCaptureScreenshotFormatJpeg,
+		Quality: gson.Int(99),
+		Clip: &proto.PageViewport{
+			X:      r.X,
+			Y:      r.Y,
+			Width:  r.Width,
+			Height: r.Height,
+			Scale:  1,
+		},
+		FromSurface: true,
+	}
+	return
 }

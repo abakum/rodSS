@@ -7,14 +7,11 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
-	"github.com/go-rod/rod/lib/proto"
 )
 
 func s04(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
-		imageBackground,
-		visualContainerHost proto.PageViewport
 	)
 	stdo.Println(params)
 	br, ca := chrome(slide)
@@ -29,20 +26,12 @@ func s04(slide, deb int) {
 	cb(slide, deb, page, "СЦ")
 
 	sel := "div.imageBackground"
-	ex(slide, getClientRect(page.MustElement(sel), &imageBackground))
+	ib := page.MustElement(sel).MustShape().Box()
 
 	sel = "div.visualContainerHost"
-	ex(slide, getClientRect(page.MustElement(sel), &visualContainerHost))
-
-	sl(slide).done(page.Screenshot(false, &proto.PageCaptureScreenshot{
-		Format: proto.PageCaptureScreenshotFormatJpeg,
-		Clip: clip(
-			visualContainerHost.X,
-			visualContainerHost.Y,
-			imageBackground.X-visualContainerHost.X,
-			visualContainerHost.Height,
-		),
-	}))
+	vch := page.MustElement(sel).MustShape().Box()
+	vch.Width = ib.X - vch.X
+	sl(slide).done(page.Screenshot(true, clip(vch)))
 }
 
 func cb(slide, deb int, page *rod.Page, key string) {
