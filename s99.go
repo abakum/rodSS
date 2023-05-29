@@ -87,13 +87,17 @@ func s99(slide, deb int) {
 	}).MustDo()
 	sdpt(slide, deb, page, tit)
 
+	tit = "Обрабатывается"
 	// for i := 0; i < 7; i++ {
-	// 	stdo.Println(i, page.MustSearch("обр").MustHTML())
+	// 	stdo.Println(i, page.MustSearch(tit).MustHTML())
 	// 	time.Sleep(sec)
 	// }
-
+	sel = fmt.Sprintf("div[title=%q]", tit)
+	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
+	// if !page.MustElements(sel).Empty() {
+	// 	page.Timeout(sec * 7).MustElement(sel).WaitInvisible()
+	// }
 	tit = "Обработка завершена"
-	WaitElementsLessThan(page.Timeout(sec*13), sel, 1)
 	sdpt(slide, deb, page, tit)
 
 	tit = "Сохранить и закрыть"

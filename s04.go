@@ -53,7 +53,9 @@ func cb(slide, deb int, page *rod.Page, key string) {
 	page.Timeout(to).MustElement(se).MustClick()
 
 	sel = "div.circle"
-	WaitElementsLessThan(page.Timeout(to*3), sel, 1)
-	// time.Sleep(ms)
+	// if !page.MustElements(sel).Empty() {
+	// 	page.Timeout(to).MustElement(sel).WaitInvisible()
+	// }
+	WaitElementsLessThan(page.Timeout(to), sel, 1)
 	sdpt(slide, deb, page, tit)
 }

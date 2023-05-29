@@ -69,6 +69,9 @@ func s13(slide, deb int) {
 
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to), sel, 1)
+	// if !page.MustElements(sel).Empty() {
+	// 	page.Timeout(to).MustElement(sel).WaitInvisible()
+	// }
 
 	sel = "div.visualContainerHost"
 	sl(slide).done(page.Timeout(to).MustElement(sel).Screenshot(proto.PageCaptureScreenshotFormatJpeg, 99))

@@ -50,6 +50,9 @@ func s12(slide, deb int) {
 
 	sel = "div.circle"
 	WaitElementsLessThan(page.Timeout(to), sel, 1)
+	// if !page.MustElements(sel).Empty() {
+	// 	page.Timeout(to).MustElement(sel).WaitInvisible()
+	// }
 
 	sel = "//*[@id='pvExplorationHost']/div/div/exploration/div/explore-canvas/div/div[2]/div/div[2]/div[2]/visual-container-repeat/visual-container[27]/transform/div/div[3]/div/visual-modern/div/div/div[2]/div[1]/div[3]/div/div[2]"
 	vc27 := page.MustElementX(sel).MustShape().Box()

@@ -205,13 +205,6 @@ func autoStart(started chan int, d time.Duration) *time.Timer {
 	})
 }
 
-func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
-	stdo.Println(p.Has(selector))
-	err := p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
-	stdo.Println(p.Has(selector))
-	return err
-}
-
 func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	i := <-started
 	st.Stop()
@@ -255,4 +248,8 @@ func clip(r *proto.DOMRect) (clip *proto.PageCaptureScreenshot) {
 		FromSurface: true,
 	}
 	return
+}
+
+func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
+	return p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
 }
