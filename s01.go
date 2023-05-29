@@ -24,7 +24,7 @@ func s01(slide, deb int) {
 		page = chromePage(br, slide)
 		defer page.MustClose()
 		page.Navigate(params[0])
-		sl(slide).done(page.Timeout(sec*3).MustElement(sel).
+		sl(slide).done(page.Timeout(to).MustElement(sel).
 			Screenshot(proto.PageCaptureScreenshotFormatJpeg, 99))
 	} else {
 		page, err = br.Page(proto.TargetCreateTarget{})

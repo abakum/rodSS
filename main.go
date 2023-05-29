@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,6 +22,9 @@ const (
 	to          = time.Minute * 2
 	ms          = time.Millisecond * 200
 	sec         = time.Second
+	yaBrowser   = `Yandex\YandexBrowser`
+	yaBin       = `Application\browser.exe`
+	yaDataDir   = `User Data\Default`
 )
 
 var (
@@ -38,8 +40,10 @@ var (
 	headLess     = true
 	sequentially = false
 	userMode     = false
+	yandex       = false
 	bro          *rod.Browser
-	chromeBin    string
+	bin          string
+	yowser       = filepath.Join(os.Getenv("LOCALAPPDATA"), yaBrowser)
 )
 
 func main() {
@@ -80,6 +84,8 @@ func main() {
 		case 6, -6:
 			userMode = true
 			multiBrowser = false
+		case 7, -7:
+			yandex = true
 		case 14:
 			slides = []int{1, 4, 5, 8, 12, 13}
 		case -14:
@@ -96,9 +102,13 @@ func main() {
 		slides = append(slides, 0)
 	}
 	ctRoot, caRoot = context.WithCancel(context.Background())
-	chromeBin, ok = launcher.LookPath()
+	bin, ok = launcher.LookPath()
 	if !ok {
-		ex(2, fmt.Errorf("not found chromeBin"))
+		yandex = true
+		// ex(2, fmt.Errorf("not found chromeBin"))
+	}
+	if yandex {
+		bin = filepath.Join(yowser, yaBin)
 	}
 	exeN, exeF, err := exeFN()
 	ex(2, err)

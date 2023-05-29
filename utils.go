@@ -100,21 +100,28 @@ func sdpf(slide, deb int, page *rod.Page, fn string) {
 }
 func launch() (l *launcher.Launcher) {
 	if userMode {
-		_, exeN := filepath.Split(chromeBin)
+		_, exeN := filepath.Split(bin)
 		taskKill("/f", "/im", exeN)
 		time.Sleep(sec)
 		l = launcher.NewUserMode()
 	} else {
 		l = launcher.New().
 			Leakless(false). //panic: open C:\Users\user\AppData\Local\Temp\leakless-0c3354cd58f0813bb5b34ddf3a7c16ed\leakless.exe: Access is denied.
-			Bin(chromeBin)
+			Bin(bin)
 	}
 	l = l.
 		Delete("enable-automation").
 		Set("start-maximized")
 	if !multiBrowser && !userMode {
-		l = l.
-			UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir))
+		if yandex {
+			l = l.
+				UserDataDir(filepath.Join(yowser, yaDataDir))
+		} else {
+			l = l.
+				UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir))
+
+		}
+
 	}
 	if headLess {
 		l = l.
@@ -136,6 +143,7 @@ func chrome(slide int) (b *rod.Browser, f func()) {
 			ControlURL(launch().
 				MustLaunch(),
 			).MustConnect().
+			// MustIgnoreCertErrors(true).
 			Context(ctRoot)
 		f = b.MustClose
 	} else {
@@ -145,6 +153,7 @@ func chrome(slide int) (b *rod.Browser, f func()) {
 	if !headLess {
 		b = b.SlowMotion(sec).Trace(true)
 	}
+	stdo.Println(b.MustVersion())
 	return
 }
 
