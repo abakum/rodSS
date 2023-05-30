@@ -58,8 +58,8 @@ func cb(slide, deb int, page *rod.Page, key string) {
 	// }
 	// WaitElementsLessThan(page.Timeout(to), sel, 1)
 	// stdo.Println(len(page.MustElements(sel)))
-	page.Timeout(to).MustWaitStable()
-	// stdo.Println(len(page.MustElements(sel)))
+	// page.Timeout(to).MustWaitStable()
+	stdo.Println(len(page.MustElements(sel)))
 
 	sdpt(slide, deb, page, tit)
 }

@@ -159,6 +159,7 @@ func main() {
 		go start(s08, 8, de, &wg, started)
 		go start(s12, 12, de, &wg, started)
 		go start(s13, 13, de, &wg, started)
+		go start(s10, 10, de, &wg, started)
 		if sequentially {
 			wait(st, &wg, started)
 			st = autoStart(started, sec)

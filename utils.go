@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -36,7 +37,7 @@ func (i ss) write(fileName string) {
 	if jpg {
 		fullName = filepath.Join(root, fileName)
 	}
-	err := os.WriteFile(fullName, []byte(i), 0644)
+	err := os.WriteFile(fullName, []byte(i), 0o644)
 	if err != nil {
 		return
 	}
@@ -95,7 +96,7 @@ func sdpf(slide, deb int, page *rod.Page, fn string) {
 	}
 	bytes, err := page.Screenshot(false, &proto.PageCaptureScreenshot{Format: proto.PageCaptureScreenshotFormatPng})
 	if err == nil {
-		ss(bytes).write(fn)
+		ss(bytes).write(strings.ReplaceAll(fn, ":", ""))
 	}
 }
 func launch() (l *launcher.Launcher) {
@@ -231,6 +232,7 @@ func chromePage(br *rod.Browser, slide int) (page *rod.Page) {
 	page = br.MustPage().WithPanic(func(x interface{}) {
 		e(slide, 14, x.(error))
 	}).MustSetViewport(1920, 1080, 1, false)
+	SetCookiesP(page, slide)
 	if headLess {
 		return
 	}
@@ -255,4 +257,40 @@ func clip(r *proto.DOMRect) (clip *proto.PageCaptureScreenshot) {
 
 func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
 	return p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
+}
+func GetCookiesB(br *rod.Browser, slide int) {
+	cookies, err := br.GetCookies()
+	if err == nil {
+		bytes, err := json.Marshal(&cookies)
+		if err == nil {
+			os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+		}
+	}
+}
+func SetCookiesB(br *rod.Browser, slide int) {
+	bytes, err := os.ReadFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)))
+	if err == nil {
+		cookies := []*proto.NetworkCookie{}
+		if json.Unmarshal(bytes, &cookies) == nil {
+			br.SetCookies(proto.CookiesToParams(cookies))
+		}
+	}
+}
+func GetCookiesP(page *rod.Page, slide int) {
+	cookies, err := page.Cookies([]string{})
+	if err != nil {
+		bytes, err := json.Marshal(&cookies)
+		if err == nil {
+			os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+		}
+	}
+}
+func SetCookiesP(page *rod.Page, slide int) {
+	bytes, err := os.ReadFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)))
+	if err == nil {
+		cookies := []*proto.NetworkCookie{}
+		if json.Unmarshal(bytes, &cookies) == nil {
+			page.SetCookies(proto.CookiesToParams(cookies))
+		}
+	}
 }

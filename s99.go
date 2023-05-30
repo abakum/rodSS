@@ -33,6 +33,8 @@ func s99(slide, deb int) {
 			sel = fmt.Sprintf("input[name=%q]", tit)
 			page.Timeout(to).MustElement(sel).MustInput(params[2]).Page().Keyboard.MustType(input.Enter)
 			sdpt(slide, deb, page, tit)
+			// GetCookiesP(page, slide)
+			GetCookiesB(br, slide)
 		}
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
@@ -93,11 +95,11 @@ func s99(slide, deb int) {
 	// 	time.Sleep(sec)
 	// }
 	sel = fmt.Sprintf("div[title=%q]", tit)
-	// WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
+	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
 	// if !page.MustElements(sel).Empty() {
 	// 	page.Timeout(sec * 7).MustElement(sel).WaitInvisible()
 	// }
-	page.Timeout(to).MustWaitStable()
+	// page.Timeout(to).MustWaitStable()
 
 	tit = "Обработка завершена"
 	sdpt(slide, deb, page, tit)
