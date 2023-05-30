@@ -113,15 +113,8 @@ func launch() (l *launcher.Launcher) {
 		Delete("enable-automation").
 		Set("start-maximized")
 	if !multiBrowser && !userMode {
-		if yandex {
-			l = l.
-				UserDataDir(filepath.Join(yowser, yaDataDir))
-		} else {
-			l = l.
-				UserDataDir(filepath.Join(os.Getenv("LOCALAPPDATA"), userDataDir))
-
-		}
-
+		l = l.
+			UserDataDir(userDataDir)
 	}
 	if headLess {
 		l = l.
@@ -181,6 +174,7 @@ func Scanln() {
 	stdo.Print(src(8), "\nPress Enter>")
 	fmt.Scanln()
 }
+
 func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan int) {
 	switch deb {
 	case 0, slide, -slide:
@@ -196,7 +190,6 @@ func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started 
 	}
 	fu(slide, deb)
 	stdo.Printf("%s %02d done\n", src(8), slide)
-
 }
 
 func abs(i int) int {
@@ -205,6 +198,7 @@ func abs(i int) int {
 	}
 	return -i
 }
+
 func autoStart(started chan int, d time.Duration) *time.Timer {
 	for len(started) > 0 {
 		<-started

@@ -76,7 +76,7 @@ func s99(slide, deb int) {
 
 	tit = "Загрузка завершена"
 	page.Timeout(sec * 13).WithPanic(func(x interface{}) {
-		tit = "загрузка не завершилась за 13 секунды"
+		tit = "загрузка не завершилась за 13 секунд"
 		sdpt(slide, deb, page, tit)
 		ex(slide, fmt.Errorf(tit))
 	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
@@ -93,10 +93,12 @@ func s99(slide, deb int) {
 	// 	time.Sleep(sec)
 	// }
 	sel = fmt.Sprintf("div[title=%q]", tit)
-	WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
+	// WaitElementsLessThan(page.Timeout(sec*7), sel, 1)
 	// if !page.MustElements(sel).Empty() {
 	// 	page.Timeout(sec * 7).MustElement(sel).WaitInvisible()
 	// }
+	page.Timeout(to).MustWaitStable()
+
 	tit = "Обработка завершена"
 	sdpt(slide, deb, page, tit)
 

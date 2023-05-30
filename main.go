@@ -15,16 +15,16 @@ import (
 )
 
 const (
-	doc         = "doc"
-	bat         = "abaku.bat"
-	mov         = "abaku.mp4"
-	userDataDir = `Google\Chrome\User Data\Default`
-	to          = time.Minute * 2
-	ms          = time.Millisecond * 200
-	sec         = time.Second
-	yaBrowser   = `Yandex\YandexBrowser`
-	yaBin       = `Application\browser.exe`
-	yaDataDir   = `User Data\Default`
+	doc       = "doc"
+	bat       = "abaku.bat"
+	mov       = "abaku.mp4"
+	chDataDir = `Google\Chrome\User Data\Default`
+	yaBrowser = `Yandex\YandexBrowser`
+	yaBin     = `Application\browser.exe`
+	yaDataDir = `User Data\Default`
+	to        = time.Minute * 2
+	ms        = time.Millisecond * 200
+	sec       = time.Second
 )
 
 var (
@@ -43,6 +43,7 @@ var (
 	yandex       = false
 	bro          *rod.Browser
 	bin          string
+	userDataDir  = filepath.Join(os.Getenv("LOCALAPPDATA"), chDataDir)
 	yowser       = filepath.Join(os.Getenv("LOCALAPPDATA"), yaBrowser)
 )
 
@@ -109,6 +110,7 @@ func main() {
 	}
 	if yandex {
 		bin = filepath.Join(yowser, yaBin)
+		userDataDir = filepath.Join(yowser, yaDataDir)
 	}
 	exeN, exeF, err := exeFN()
 	ex(2, err)
