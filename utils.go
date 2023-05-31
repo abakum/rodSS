@@ -16,6 +16,7 @@ import (
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
+	"github.com/mymmrac/telego"
 	"github.com/xlab/closer"
 	"github.com/ysmood/gson"
 )
@@ -111,11 +112,11 @@ func launch() (l *launcher.Launcher) {
 			Bin(bin)
 	}
 	l = l.
-		Delete("enable-automation").
-		Set("start-maximized")
+		Delete("enable-automation") //.Set("start-maximized")
 	if !multiBrowser && !userMode {
 		l = l.
 			UserDataDir(userDataDir)
+		stdo.Println("UserDataDir", userDataDir)
 	}
 	if headLess {
 		l = l.
@@ -147,6 +148,7 @@ func chrome(slide int) (b *rod.Browser, f func()) {
 	if !headLess {
 		b = b.SlowMotion(sec).Trace(true)
 	}
+	SetAllCookies(b, slide)
 	stdo.Println(b.MustVersion())
 	return
 }
@@ -232,11 +234,11 @@ func chromePage(br *rod.Browser, slide int) (page *rod.Page) {
 	page = br.MustPage().WithPanic(func(x interface{}) {
 		e(slide, 14, x.(error))
 	}).MustSetViewport(1920, 1080, 1, false)
-	SetCookiesP(page, slide)
+	// SetCookies(page, slide)
 	if headLess {
 		return
 	}
-	return page.MustWindowFullscreen()
+	return page.MustWindowMaximize() //.MustWindowFullscreen()
 }
 
 func clip(r *proto.DOMRect) (clip *proto.PageCaptureScreenshot) {
@@ -258,39 +260,48 @@ func clip(r *proto.DOMRect) (clip *proto.PageCaptureScreenshot) {
 func WaitElementsLessThan(p *rod.Page, selector string, num int) error {
 	return p.Wait(rod.Eval(`(s, n) => document.querySelectorAll(s).length < n`, selector, num))
 }
-func GetCookiesB(br *rod.Browser, slide int) {
+func GetAllCookies(br *rod.Browser, slide int) (ok bool) {
 	cookies, err := br.GetCookies()
-	if err == nil {
+	if err == nil && len(cookies) > 0 {
 		bytes, err := json.Marshal(&cookies)
 		if err == nil {
-			os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+			err = os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+			ok = err == nil
 		}
 	}
+	return
 }
-func SetCookiesB(br *rod.Browser, slide int) {
+func SetAllCookies(br *rod.Browser, slide int) {
 	bytes, err := os.ReadFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)))
 	if err == nil {
 		cookies := []*proto.NetworkCookie{}
 		if json.Unmarshal(bytes, &cookies) == nil {
 			br.SetCookies(proto.CookiesToParams(cookies))
+			stdo.Println("SetAllCookies")
 		}
 	}
 }
-func GetCookiesP(page *rod.Page, slide int) {
-	cookies, err := page.Cookies([]string{})
-	if err != nil {
+func GetCookies(page *rod.Page, urls []string, slide int) (ok bool) {
+	cookies, err := page.Cookies(urls)
+	if err == nil && len(cookies) > 0 {
 		bytes, err := json.Marshal(&cookies)
 		if err == nil {
-			os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+			err = os.WriteFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)), bytes, 0o644)
+			ok = err == nil
 		}
 	}
+	return
 }
-func SetCookiesP(page *rod.Page, slide int) {
+func SetCookies(page *rod.Page, slide int) {
 	bytes, err := os.ReadFile(filepath.Join(cd, fmt.Sprintf("%02d.json", slide)))
 	if err == nil {
 		cookies := []*proto.NetworkCookie{}
 		if json.Unmarshal(bytes, &cookies) == nil {
 			page.SetCookies(proto.CookiesToParams(cookies))
+			stdo.Println("SetCookies")
 		}
 	}
+}
+func DeleteMessage(ChatID telego.ChatID, MessageID int) *telego.DeleteMessageParams {
+	return &telego.DeleteMessageParams{ChatID: ChatID, MessageID: MessageID}
 }

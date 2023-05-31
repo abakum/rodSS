@@ -33,13 +33,15 @@ func s99(slide, deb int) {
 			sel = fmt.Sprintf("input[name=%q]", tit)
 			page.Timeout(to).MustElement(sel).MustInput(params[2]).Page().Keyboard.MustType(input.Enter)
 			sdpt(slide, deb, page, tit)
-			// GetCookiesP(page, slide)
-			GetCookiesB(br, slide)
+			if !GetCookies(page, []string{}, slide) {
+				if !GetCookies(page, []string{".wapi.ds.rt.ru"}, slide) {
+					GetAllCookies(br, slide)
+				}
+			}
 		}
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 
-	// stdo.Println(page.MustSearch(tit).MustHTML())
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(ms)
 	sdpt(slide, deb, page, tit)

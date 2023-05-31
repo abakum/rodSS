@@ -32,7 +32,9 @@ func s08(slide, deb int) {
 		sel = "input#login_form-password"
 		e.Page().MustElement(sel).MustInput(params[2]).MustType(input.Enter)
 		sdpt(slide, deb, e.Page(), tit)
-		GetCookiesP(page, slide)
+		if !GetCookies(page, []string{}, slide) {
+			GetAllCookies(br, slide)
+		}
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
 

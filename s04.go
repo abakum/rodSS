@@ -56,10 +56,10 @@ func cb(slide, deb int, page *rod.Page, key string) {
 	// if !page.MustElements(sel).Empty() {
 	// 	page.Timeout(to).MustElement(sel).WaitInvisible()
 	// }
-	// WaitElementsLessThan(page.Timeout(to), sel, 1)
+	WaitElementsLessThan(page.Timeout(to), sel, 1)
 	// stdo.Println(len(page.MustElements(sel)))
 	// page.Timeout(to).MustWaitStable()
-	stdo.Println(len(page.MustElements(sel)))
+	// stdo.Println(len(page.MustElements(sel)))
 
 	sdpt(slide, deb, page, tit)
 }

@@ -52,7 +52,8 @@ func s98(slide, deb int) {
 	messages, _ = bot.SendMediaGroup(tu.MediaGroup(chat).WithMedia(medias...))
 	if len(messages) != len(medias) {
 		for _, v := range messages {
-			bot.DeleteMessage(&telego.DeleteMessageParams{ChatID: chat, MessageID: v.MessageID})
+			// bot.DeleteMessage(&telego.DeleteMessageParams{ChatID: chat, MessageID: v.MessageID})
+			bot.DeleteMessage(DeleteMessage(chat, v.MessageID))
 		}
 		stdo.Println()
 		return
@@ -61,12 +62,12 @@ func s98(slide, deb int) {
 		if v == 0 {
 			continue
 		}
-		bot.DeleteMessage(&telego.DeleteMessageParams{ChatID: chat, MessageID: v})
+		// bot.DeleteMessage(&telego.DeleteMessageParams{ChatID: chat, MessageID: v})
+		bot.DeleteMessage(DeleteMessage(chat, v))
 	}
 	conf.Ids = []int{}
 	for _, v := range messages {
 		conf.Ids = append(conf.Ids, v.MessageID)
 	}
-	err = conf.saver()
-	ex(slide, err)
+	ex(slide, conf.saver())
 }

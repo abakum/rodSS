@@ -168,15 +168,15 @@ func main() {
 	if !sequentially {
 		wait(st, &wg, started)
 	}
+	st = autoStart(started, sec)
 	for _, de := range slides {
 		if de != 0 && abs(de) < 97 {
 			continue
 		}
 		stdo.Println(de)
-		start(s97, 97, de, nil, nil) //bat jpgs to mov
-		st = autoStart(started, sec)
+		start(s97, 97, de, nil, nil)        //bat jpgs to mov
 		go start(s98, 98, de, &wg, started) //telegram
 		go start(s99, 99, de, &wg, started) //ss
-		wait(st, &wg, started)
 	}
+	wait(st, &wg, started)
 }
