@@ -26,6 +26,8 @@ func s10(slide, deb int) {
 		telegs = conf.P["98"]
 		parts  []string
 		href   = &str
+		delim  = tu.Entity("\n")
+		mecs   = []tu.MessageEntityCollection{}
 	)
 	stdo.Println(params)
 
@@ -68,7 +70,6 @@ func s10(slide, deb int) {
 	tit = page.MustInfo().Title
 	sdpt(slide, deb, page, tit)
 
-	mecs := []tu.MessageEntityCollection{}
 	ecs := []tu.MessageEntityCollection{
 		tu.Entity("Начал "),
 		tu.Entity("мониторить").TextLink(params[0]),
@@ -85,7 +86,6 @@ func s10(slide, deb int) {
 		MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
 		conf.saver()
 	})
-	delim := tu.Entity("\n")
 	for {
 		ecs = []tu.MessageEntityCollection{}
 		sel = "tr.nothing-to-show"
@@ -165,14 +165,17 @@ func s10(slide, deb int) {
 func delSend(bot *telego.Bot, chat telego.ChatID, MessageID int, mecs ...tu.MessageEntityCollection) (int, string) {
 	// return MessageID, strconv.Itoa(MessageID)
 	bot.DeleteMessage(DeleteMessage(chat, MessageID))
-	if len(mecs) > 0 {
-		tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
-		if err == nil {
-			MessageID = tm.MessageID
-			text, _ := tu.MessageEntities(mecs...)
-			stdo.Println(text)
-			stdo.Println("MessageID", MessageID)
+	if len(mecs) == 0 {
+		mecs = []tu.MessageEntityCollection{
+			tu.Entity("Продолжаю мониторить ЕГЭ"),
 		}
+	}
+	tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
+	if err == nil {
+		MessageID = tm.MessageID
+		text, _ := tu.MessageEntities(mecs...)
+		stdo.Println(text)
+		stdo.Println("MessageID", MessageID)
 	}
 	return MessageID, strconv.Itoa(MessageID)
 }
