@@ -22,10 +22,9 @@ func s10(slide, deb int) {
 		timeline,
 		text,
 		hintbox,
-		str string
+		href string
 		telegs = conf.P["98"]
 		parts  []string
-		href   = &str
 		eol    = tu.Entity("\n")
 		space  = tu.Entity(" ")
 		mecs   = []tu.MessageEntityCollection{}
@@ -122,13 +121,10 @@ func s10(slide, deb int) {
 					sel = "td.timeline-date > a"
 					el, err = tr.Timeout(sec).Element(sel)
 					timeline = ""
-					href = &str
+					href = ""
 					if err == nil {
 						timeline = sErr(el.Text())
-						href, err = el.Attribute("href")
-						if err != nil {
-							href = &str
-						}
+						href = nErr(el.Attribute("href"))
 					}
 
 					sel = "td > a.link-action[aria-haspopup='true']"
@@ -142,7 +138,7 @@ func s10(slide, deb int) {
 					}
 
 					if len(parts) > 3 {
-						ecs = append(ecs, tu.Entity(timeline).TextLink(base.String()+"/"+*href), space)
+						ecs = append(ecs, tu.Entity(timeline).TextLink(base.String()+"/"+href), space)
 						ecs = append(ecs, tu.Entity(parts[2]).Code(), space)
 						ecs = append(ecs, tu.Entity(parts[1]).TextLink(params[3]+parts[1]), eol)
 						ecs = append(ecs, tu.Entity(strings.TrimPrefix(parts[3], params[4])), eol)
