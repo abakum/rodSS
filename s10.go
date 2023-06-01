@@ -80,7 +80,7 @@ func s10(slide, deb int) {
 	MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
 	closer.Bind(func() {
 		ecs = []tu.MessageEntityCollection{
-			tu.Entity("Завершил "),
+			tu.Entity("Прекратил "),
 			tu.Entity("мониторить").TextLink(params[0]),
 			tu.Entity(" ЕГЭ")}
 		MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
