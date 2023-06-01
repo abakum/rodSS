@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -19,10 +20,15 @@ func s10(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 		timeline,
-		text string
+		text,
+		hintbox,
+		str string
 		telegs = conf.P["98"]
+		parts  []string
+		href   = &str
 	)
 	stdo.Println(params)
+
 	MessageID, _ := strconv.Atoi(params[5])
 	bot, err := telego.NewBot(telegs[0], telego.WithDefaultDebugLogger())
 	ex(slide, err)
@@ -30,6 +36,11 @@ func s10(slide, deb int) {
 	i, err := strconv.ParseInt(telegs[1], 10, 64)
 	ex(slide, err)
 	chat := tu.ID(i)
+
+	base, err := url.Parse(params[0])
+	ex(slide, err)
+	base.Path = ""
+	base.RawQuery = ""
 
 	br, ca := chrome(slide)
 	defer ca()
@@ -74,25 +85,68 @@ func s10(slide, deb int) {
 		MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
 		conf.saver()
 	})
+	delim := tu.Entity("\n")
 	for {
 		ecs = []tu.MessageEntityCollection{}
 		sel = "tr.nothing-to-show"
 		if !page.MustHas(sel) {
-			for _, el := range page.Timeout(sec).MustElements(se) {
-				sel = "td.timeline-date > a"
-				timeline = el.MustElement(sel).MustText()
-				sel = "td > a.link-action"
-				text = el.MustElement(sel).MustText()
-				stdo.Println(timeline, text, el)
+			for _, tr := range page.Timeout(sec * 7).MustElements(se) {
+				text, err = tr.Text()
+				if err != nil {
+					continue
+				}
+				if strings.Contains(text, "РЕШЕНО") {
+					continue
+				}
 				for _, v := range params[6:] {
-					if strings.Contains(text, v) {
-						parts := strings.Split(text, " | ")
-						if len(parts) == 4 {
-							ecs = append(ecs, tu.Entity(timeline).Code(), tu.Entity("│"))
-							ecs = append(ecs, tu.Entity(parts[1]).TextLink(params[3]+parts[1]), tu.Entity("│"))
-							ecs = append(ecs, tu.Entity(parts[2]).Code(), tu.Entity("│"))
-							ecs = append(ecs, tu.Entity(strings.TrimPrefix(parts[3], params[4])).Code(), tu.Entity("\n"))
+					if !strings.Contains(text, v) {
+						continue
+					}
+
+					sel = "td > a.link-action[data-hintbox='1']"
+					el, err := tr.Element(sel)
+					if err != nil {
+						continue
+					}
+					hintbox, err = el.Text()
+					if err != nil {
+						hintbox = ""
+					}
+
+					sel = "td.timeline-date > a"
+					el, err = tr.Element(sel)
+					if err != nil {
+						timeline = ""
+						href = &str
+					} else {
+						timeline, err = el.Text()
+						if err != nil {
+							timeline = ""
 						}
+						href, err = el.Attribute("href")
+						if err != nil {
+							href = &str
+						}
+					}
+
+					sel = "td > a.link-action[aria-haspopup='true']"
+					el, err = tr.Element(sel)
+					if err != nil {
+						text = " |  |  | "
+					} else {
+						text, err = el.Text()
+						if err != nil {
+							text = " |  |  | "
+						}
+					}
+					parts = strings.Split(text, " | ")
+
+					if len(parts) > 3 {
+						ecs = append(ecs, tu.Entity(timeline).TextLink(base.String()+"/"+*href), tu.Entity(" "))
+						ecs = append(ecs, tu.Entity(parts[2]).Code(), tu.Entity(" "))
+						ecs = append(ecs, tu.Entity(parts[1]).TextLink(params[3]+parts[1]), delim)
+						ecs = append(ecs, tu.Entity(strings.TrimPrefix(parts[3], params[4])), delim)
+						ecs = append(ecs, tu.Entity(hintbox), delim, delim)
 					}
 
 				}
@@ -109,12 +163,16 @@ func s10(slide, deb int) {
 }
 
 func delSend(bot *telego.Bot, chat telego.ChatID, MessageID int, mecs ...tu.MessageEntityCollection) (int, string) {
+	// return MessageID, strconv.Itoa(MessageID)
 	bot.DeleteMessage(DeleteMessage(chat, MessageID))
 	if len(mecs) > 0 {
-		stdo.Println(tu.MessageEntities(mecs...))
 		tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
-		ex(10, err)
-		MessageID = tm.MessageID
+		if err == nil {
+			MessageID = tm.MessageID
+			text, _ := tu.MessageEntities(mecs...)
+			stdo.Println(text)
+			stdo.Println("MessageID", MessageID)
+		}
 	}
 	return MessageID, strconv.Itoa(MessageID)
 }
