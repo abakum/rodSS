@@ -305,3 +305,10 @@ func SetCookies(page *rod.Page, slide int) {
 func DeleteMessage(ChatID telego.ChatID, MessageID int) *telego.DeleteMessageParams {
 	return &telego.DeleteMessageParams{ChatID: ChatID, MessageID: MessageID}
 }
+
+func sErr(s string, err error) string {
+	if err != nil {
+		return err.Error()
+	}
+	return s
+}

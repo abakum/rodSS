@@ -26,18 +26,23 @@ func s10(slide, deb int) {
 		telegs = conf.P["98"]
 		parts  []string
 		href   = &str
-		delim  = tu.Entity("\n")
+		eol    = tu.Entity("\n")
+		space  = tu.Entity(" ")
 		mecs   = []tu.MessageEntityCollection{}
 	)
 	stdo.Println(params)
 
-	MessageID, _ := strconv.Atoi(params[5])
+	MessageID, err := strconv.Atoi(params[5])
+	if err != nil {
+		MessageID = 0
+	}
+
 	bot, err := telego.NewBot(telegs[0], telego.WithDefaultDebugLogger())
 	ex(slide, err)
 	defer bot.Close()
 	i, err := strconv.ParseInt(telegs[1], 10, 64)
 	ex(slide, err)
-	chat := tu.ID(i)
+	ChatID := tu.ID(i)
 
 	base, err := url.Parse(params[0])
 	ex(slide, err)
@@ -70,20 +75,24 @@ func s10(slide, deb int) {
 	tit = page.MustInfo().Title
 	sdpt(slide, deb, page, tit)
 
+	suffix := []tu.MessageEntityCollection{
+		tu.Entity("мониторить").TextLink(params[0]),
+		tu.Entity(" ЕГЭ"),
+	}
 	ecs := []tu.MessageEntityCollection{
 		tu.Entity("Начал "),
-		tu.Entity("мониторить").TextLink(params[0]),
-		tu.Entity(" ЕГЭ:")}
+	}
+	ecs = append(ecs, suffix...)
 	for _, v := range params[6:] {
 		ecs = append(ecs, tu.Entityf("\n%s", v))
 	}
-	MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
+	MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
 	closer.Bind(func() {
 		ecs = []tu.MessageEntityCollection{
 			tu.Entity("Прекратил "),
-			tu.Entity("мониторить").TextLink(params[0]),
-			tu.Entity(" ЕГЭ")}
-		MessageID, params[5] = delSend(bot, chat, MessageID, ecs...)
+		}
+		ecs = append(ecs, suffix...)
+		MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
 		conf.saver()
 	})
 	for {
@@ -104,25 +113,18 @@ func s10(slide, deb int) {
 					}
 
 					sel = "td > a.link-action[data-hintbox='1']"
-					el, err := tr.Element(sel)
+					el, err := tr.Timeout(sec).Element(sel)
 					if err != nil {
 						continue
 					}
-					hintbox, err = el.Text()
-					if err != nil {
-						hintbox = ""
-					}
+					hintbox = sErr(el.Text())
 
 					sel = "td.timeline-date > a"
-					el, err = tr.Element(sel)
-					if err != nil {
-						timeline = ""
-						href = &str
-					} else {
-						timeline, err = el.Text()
-						if err != nil {
-							timeline = ""
-						}
+					el, err = tr.Timeout(sec).Element(sel)
+					timeline = ""
+					href = &str
+					if err == nil {
+						timeline = sErr(el.Text())
 						href, err = el.Attribute("href")
 						if err != nil {
 							href = &str
@@ -130,25 +132,22 @@ func s10(slide, deb int) {
 					}
 
 					sel = "td > a.link-action[aria-haspopup='true']"
-					el, err = tr.Element(sel)
-					if err != nil {
-						text = " |  |  | "
-					} else {
+					el, err = tr.Timeout(sec).Element(sel)
+					parts = []string{"", "", "", ""}
+					if err == nil {
 						text, err = el.Text()
-						if err != nil {
-							text = " |  |  | "
+						if err == nil {
+							parts = strings.Split(text, " | ")
 						}
 					}
-					parts = strings.Split(text, " | ")
 
 					if len(parts) > 3 {
-						ecs = append(ecs, tu.Entity(timeline).TextLink(base.String()+"/"+*href), tu.Entity(" "))
-						ecs = append(ecs, tu.Entity(parts[2]).Code(), tu.Entity(" "))
-						ecs = append(ecs, tu.Entity(parts[1]).TextLink(params[3]+parts[1]), delim)
-						ecs = append(ecs, tu.Entity(strings.TrimPrefix(parts[3], params[4])), delim)
-						ecs = append(ecs, tu.Entity(hintbox), delim, delim)
+						ecs = append(ecs, tu.Entity(timeline).TextLink(base.String()+"/"+*href), space)
+						ecs = append(ecs, tu.Entity(parts[2]).Code(), space)
+						ecs = append(ecs, tu.Entity(parts[1]).TextLink(params[3]+parts[1]), eol)
+						ecs = append(ecs, tu.Entity(strings.TrimPrefix(parts[3], params[4])), eol)
+						ecs = append(ecs, tu.Entity(hintbox), eol, eol)
 					}
-
 				}
 			}
 		}
@@ -156,20 +155,20 @@ func s10(slide, deb int) {
 		ec, _ := tu.MessageEntities(ecs...)
 		if mec != ec {
 			mecs = ecs[:]
-			MessageID, params[5] = delSend(bot, chat, MessageID, mecs...)
+			if len(ecs) == 0 {
+				ecs = []tu.MessageEntityCollection{
+					tu.Entity("Продолжаю "),
+				}
+				ecs = append(ecs, suffix...)
+			}
+			MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
 		}
 		time.Sleep(sec * 30)
 	}
 }
 
 func delSend(bot *telego.Bot, chat telego.ChatID, MessageID int, mecs ...tu.MessageEntityCollection) (int, string) {
-	// return MessageID, strconv.Itoa(MessageID)
 	bot.DeleteMessage(DeleteMessage(chat, MessageID))
-	if len(mecs) == 0 {
-		mecs = []tu.MessageEntityCollection{
-			tu.Entity("Продолжаю мониторить ЕГЭ"),
-		}
-	}
 	tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
 	if err == nil {
 		MessageID = tm.MessageID
