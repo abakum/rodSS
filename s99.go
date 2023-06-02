@@ -41,7 +41,7 @@ func s99(slide, deb int) {
 		}
 	}).Search(tit).MustHandle(func(e *rod.Element) {
 	}).MustDo()
-
+	// Scanln()
 	page.Timeout(to).MustSearch(tit).MustClick()
 	time.Sleep(ms)
 	sdpt(slide, deb, page, tit)

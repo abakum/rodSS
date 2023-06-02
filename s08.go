@@ -71,7 +71,7 @@ func s08(slide, deb int) {
 	sdpt(slide, deb, page, tit)
 
 	sel = "span.ui-chkbox-label"
-	page.Timeout(to).MustElement(sel).MustClick()
+	page.Timeout(to * 2).MustElement(sel).MustClick()
 	sel = "button#report_actions_form-export_report_data > span"
 	page.Timeout(to).MustElement(sel).MustClick()
 
