@@ -5,16 +5,16 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mymmrac/telego"
+	tg "github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 func s98(slide, deb int) {
 	var (
-		bot      *telego.Bot
+		bot      *tg.Bot
 		file     *os.File
-		medias   []telego.InputMedia
-		messages []telego.Message
+		medias   []tg.InputMedia
+		messages []tg.Message
 		err      error
 		inds     = []int{1, 4, 5, 8, 12, 13, 97}
 		params   = conf.P[strconv.Itoa(slide)]
@@ -29,10 +29,10 @@ func s98(slide, deb int) {
 			return
 		}
 	}
-	bot, err = telego.NewBot(params[0], telego.WithDefaultDebugLogger())
+	bot, err = tg.NewBot(params[0], tg.WithDefaultDebugLogger())
 	ex(slide, err)
 	defer bot.Close()
-	medias = []telego.InputMedia{}
+	medias = []tg.InputMedia{}
 	for _, v := range inds {
 		file, err = os.Open(i2p(v))
 		if err != nil {

@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -16,7 +17,8 @@ import (
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
-	"github.com/mymmrac/telego"
+	tg "github.com/mymmrac/telego"
+	tu "github.com/mymmrac/telego/telegoutil"
 	"github.com/xlab/closer"
 	"github.com/ysmood/gson"
 )
@@ -302,8 +304,8 @@ func SetCookies(page *rod.Page, slide int) {
 		}
 	}
 }
-func DeleteMessage(ChatID telego.ChatID, MessageID int) *telego.DeleteMessageParams {
-	return &telego.DeleteMessageParams{ChatID: ChatID, MessageID: MessageID}
+func DeleteMessage(ChatID tg.ChatID, MessageID int) *tg.DeleteMessageParams {
+	return &tg.DeleteMessageParams{ChatID: ChatID, MessageID: MessageID}
 }
 
 func sErr(s string, err error) string {
@@ -317,4 +319,16 @@ func nErr(s *string, err error) string {
 		return err.Error()
 	}
 	return *s
+}
+
+func delSend(bot *tg.Bot, chat tg.ChatID, MessageID int, mecs ...tu.MessageEntityCollection) (int, string) {
+	bot.DeleteMessage(DeleteMessage(chat, MessageID))
+	tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
+	if err == nil {
+		MessageID = tm.MessageID
+		text, _ := tu.MessageEntities(mecs...)
+		stdo.Println(text)
+		stdo.Println("MessageID", MessageID)
+	}
+	return MessageID, strconv.Itoa(MessageID)
 }

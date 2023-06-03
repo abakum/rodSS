@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
-	"github.com/mymmrac/telego"
+	tg "github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
 	"github.com/xlab/closer"
 )
@@ -36,9 +36,8 @@ func s10(slide, deb int) {
 		MessageID = 0
 	}
 
-	bot, err := telego.NewBot(telegs[0], telego.WithDefaultDebugLogger())
+	bot, err := tg.NewBot(telegs[0], tg.WithDefaultDebugLogger())
 	ex(slide, err)
-	defer bot.Close()
 	i, err := strconv.ParseInt(telegs[1], 10, 64)
 	ex(slide, err)
 	ChatID := tu.ID(i)
@@ -49,10 +48,8 @@ func s10(slide, deb int) {
 	base.RawQuery = ""
 
 	br, ca := chrome(slide)
-	defer ca()
 	page := chromePage(br, slide).
 		MustNavigate(params[0]).MustWaitLoad()
-	defer page.MustClose()
 	tit := page.MustInfo().Title
 
 	sel := "button#login"
@@ -87,12 +84,21 @@ func s10(slide, deb int) {
 	}
 	MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
 	closer.Bind(func() {
-		ecs = []tu.MessageEntityCollection{
-			tu.Entity("Прекратил "),
+		if page != nil {
+			page.MustClose()
 		}
-		ecs = append(ecs, suffix...)
-		MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
-		conf.saver()
+		if ca != nil {
+			ca()
+		}
+		if bot != nil {
+			ecs = []tu.MessageEntityCollection{
+				tu.Entity("Прекратил "),
+			}
+			ecs = append(ecs, suffix...)
+			MessageID, params[5] = delSend(bot, ChatID, MessageID, ecs...)
+			bot.Close()
+			conf.saver()
+		}
 	})
 	for {
 		ecs = []tu.MessageEntityCollection{}
@@ -161,16 +167,4 @@ func s10(slide, deb int) {
 		}
 		time.Sleep(sec * 30)
 	}
-}
-
-func delSend(bot *telego.Bot, chat telego.ChatID, MessageID int, mecs ...tu.MessageEntityCollection) (int, string) {
-	bot.DeleteMessage(DeleteMessage(chat, MessageID))
-	tm, err := bot.SendMessage(tu.MessageWithEntities(chat, mecs...))
-	if err == nil {
-		MessageID = tm.MessageID
-		text, _ := tu.MessageEntities(mecs...)
-		stdo.Println(text)
-		stdo.Println("MessageID", MessageID)
-	}
-	return MessageID, strconv.Itoa(MessageID)
 }
