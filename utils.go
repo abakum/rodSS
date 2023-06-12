@@ -314,6 +314,7 @@ func sErr(s string, err error) string {
 	}
 	return s
 }
+
 func nErr(s *string, err error) string {
 	if err != nil {
 		return err.Error()

@@ -22,7 +22,7 @@ func s12(slide, deb int) {
 
 	tit = params[1]
 	sel := fmt.Sprintf("div[aria-label=%q]", tit)
-	page.Timeout(to * 2).MustElement(sel).MustClick()
+	page.Timeout(to * 3).MustElement(sel).MustClick()
 	sdpt(slide, deb, page, tit)
 
 	tit = "RF"
