@@ -79,8 +79,8 @@ func s99(slide, deb int) {
 	sdpt(slide, deb, page, tit)
 
 	tit = "Загрузка завершена"
-	page.Timeout(sec * 13).WithPanic(func(x interface{}) {
-		tit = "загрузка не завершилась за 13 секунд"
+	page.Timeout(sec * 33).WithPanic(func(x interface{}) {
+		tit = "загрузка не завершилась за 33 секунд"
 		sdpt(slide, deb, page, tit)
 		ex(slide, fmt.Errorf(tit))
 	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
