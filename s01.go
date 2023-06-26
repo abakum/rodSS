@@ -15,7 +15,7 @@ func s01(slide, deb int) {
 		page   *rod.Page
 		err    error
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 	br, ca := chrome(slide)
 	defer ca()
 	// params[0] = "http://ya.ru"

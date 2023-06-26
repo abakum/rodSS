@@ -16,7 +16,7 @@ func s11(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 
 	bot, err := tg.NewBot(params[0], tg.WithDefaultDebugLogger())
 	ex(slide, err)
@@ -37,7 +37,7 @@ func s11(slide, deb int) {
 			ecs = []tu.MessageEntityCollection{
 				tu.Entity("Chī le"),
 			}
-			stdo.Println(ecs, MessageID, ChatID)
+			ltf.Println(ecs, MessageID, ChatID)
 			MessageID, params[2] = delSend(bot, ChatID, MessageID, ecs...)
 			bot.Close()
 			conf.saver()
@@ -47,6 +47,6 @@ func s11(slide, deb int) {
 	for {
 		MessageID, params[2] = delSend(bot, ChatID, MessageID, ecs...)
 		t := <-ticker.C
-		stdo.Println("Tick at", t)
+		ltf.Println("Tick at", t)
 	}
 }

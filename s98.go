@@ -2,8 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	tg "github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -19,7 +21,7 @@ func s98(slide, deb int) {
 		inds     = []int{1, 4, 5, 8, 12, 13, 97}
 		params   = conf.P[strconv.Itoa(slide)]
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 	i, err := strconv.ParseInt(params[1], 10, 64)
 	ex(slide, err)
 	chat := tu.ID(i)
@@ -29,7 +31,7 @@ func s98(slide, deb int) {
 			return
 		}
 	}
-	bot, err = tg.NewBot(params[0], tg.WithDefaultDebugLogger())
+	bot, err = tg.NewBot(params[0], tg.WithLogger(tg.Logger(Logger{}))) //  tg.WithDefaultDebugLogger()
 	ex(slide, err)
 	defer bot.Close()
 	medias = []tg.InputMedia{}
@@ -55,7 +57,7 @@ func s98(slide, deb int) {
 			// bot.DeleteMessage(&telego.DeleteMessageParams{ChatID: chat, MessageID: v.MessageID})
 			bot.DeleteMessage(DeleteMessage(chat, v.MessageID))
 		}
-		stdo.Println()
+		ltf.Println()
 		return
 	}
 	for _, v := range conf.Ids {
@@ -70,4 +72,30 @@ func s98(slide, deb int) {
 		conf.Ids = append(conf.Ids, v.MessageID)
 	}
 	ex(slide, conf.saver())
+}
+
+// Custom loger type
+type Logger struct{}
+
+// Hide bot token
+func woToken(format string, args ...any) (s string) {
+	s = src(10) + " " + fmt.Sprintf(format, args...)
+	btStart := strings.Index(s, "/bot") + 4
+	if btStart > 4-1 {
+		btLen := strings.Index(s[btStart:], "/")
+		if btLen > 0 {
+			s = s[:btStart] + s[btStart+btLen:]
+		}
+	}
+	return
+}
+
+// Custom logger method for debug
+func (Logger) Debugf(format string, args ...any) {
+	lt.Print(woToken(format, args...))
+}
+
+// Custom logger method for error
+func (Logger) Errorf(format string, args ...any) {
+	let.Print(woToken(format, args...))
 }

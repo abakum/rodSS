@@ -29,7 +29,7 @@ func s10(slide, deb int) {
 		space  = tu.Entity(" ")
 		mecs   = []tu.MessageEntityCollection{}
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 
 	MessageID, err := strconv.Atoi(params[5])
 	if err != nil {

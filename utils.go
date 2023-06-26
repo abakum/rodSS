@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -57,8 +55,8 @@ func (i ss) write(fileName string) {
 func ex(slide int, err error) {
 	if err != nil {
 		exit = slide
-		stdo.Println(src(8), err.Error())
-		Scanln()
+		let.Println(src(8), err.Error())
+		pressEnter()
 		closer.Close()
 		runtime.Goexit()
 	}
@@ -66,22 +64,11 @@ func ex(slide int, err error) {
 func e(slide int, level int, err error) {
 	if err != nil {
 		exit = slide
-		stdo.Println(src(level), err.Error())
-		Scanln()
+		let.Println(src(level), err.Error())
+		pressEnter()
 		closer.Close()
 		runtime.Goexit()
 	}
-}
-
-func src(deep int) (s string) {
-	s = string(debug.Stack())
-	// for k, v := range strings.Split(s, "\n") {
-	// 	stdo.Println(k, v)
-	// }
-	s = strings.Split(s, "\n")[deep]
-	s = strings.Split(s, " +0x")[0]
-	_, s = path.Split(s)
-	return
 }
 
 func sdpt(slide, deb int, page *rod.Page, tit string) {
@@ -93,7 +80,7 @@ func sp(slide int, page *rod.Page) {
 }
 
 func sdpf(slide, deb int, page *rod.Page, fn string) {
-	stdo.Println(src(10), fn)
+	lt.Println(src(10), fn)
 	if deb != slide {
 		return
 	}
@@ -118,7 +105,7 @@ func launch() (l *launcher.Launcher) {
 	if !multiBrowser && !userMode {
 		l = l.
 			UserDataDir(userDataDir)
-		stdo.Println("UserDataDir", userDataDir)
+		ltf.Println("UserDataDir", userDataDir)
 	}
 	if headLess {
 		l = l.
@@ -126,7 +113,7 @@ func launch() (l *launcher.Launcher) {
 	} else {
 		l = l.
 			Headless(false).
-			Logger(stdo.Writer())
+			Logger(ltf.Writer())
 	}
 	return
 }
@@ -151,7 +138,7 @@ func chrome(slide int) (b *rod.Browser, f func()) {
 		b = b.SlowMotion(sec).Trace(true)
 	}
 	SetAllCookies(b, slide)
-	stdo.Println(b.MustVersion())
+	ltf.Println(b.MustVersion())
 	return
 }
 
@@ -166,7 +153,7 @@ func exeFN() (string, string, error) {
 
 func taskKill(arg ...string) {
 	cmd := exec.Command("taskKill.exe", arg...)
-	stdo.Println(src(8), cmd)
+	lt.Println(src(8), cmd)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
@@ -176,7 +163,7 @@ func Scanln() {
 	if headLess {
 		return
 	}
-	stdo.Print(src(8), "\nPress Enter>")
+	lt.Print(src(8), "\nPress Enter>")
 	fmt.Scanln()
 }
 
@@ -194,7 +181,7 @@ func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started 
 		defer wg.Done()
 	}
 	fu(slide, deb)
-	stdo.Printf("%s %02d done\n", src(8), slide)
+	ltf.Printf("%s %02d done\n", src(8), slide)
 }
 
 func abs(i int) int {
@@ -217,12 +204,12 @@ func wait(st *time.Timer, wg *sync.WaitGroup, started chan int) {
 	i := <-started
 	st.Stop()
 	if i == 0 {
-		stdo.Println("auto started")
+		ltf.Println("auto started")
 	} else {
-		stdo.Printf("s%02d %s", i, "started")
+		ltf.Printf("s%02d %s", i, "started")
 	}
 	wg.Wait()
-	stdo.Println("all done")
+	ltf.Println("all done")
 }
 
 type sl int
@@ -279,7 +266,7 @@ func SetAllCookies(br *rod.Browser, slide int) {
 		cookies := []*proto.NetworkCookie{}
 		if json.Unmarshal(bytes, &cookies) == nil {
 			br.SetCookies(proto.CookiesToParams(cookies))
-			stdo.Println("SetAllCookies")
+			ltf.Println("SetAllCookies")
 		}
 	}
 }
@@ -300,7 +287,7 @@ func SetCookies(page *rod.Page, slide int) {
 		cookies := []*proto.NetworkCookie{}
 		if json.Unmarshal(bytes, &cookies) == nil {
 			page.SetCookies(proto.CookiesToParams(cookies))
-			stdo.Println("SetCookies")
+			ltf.Println("SetCookies")
 		}
 	}
 }
@@ -328,8 +315,8 @@ func delSend(bot *tg.Bot, chat tg.ChatID, MessageID int, mecs ...tu.MessageEntit
 	if err == nil {
 		MessageID = tm.MessageID
 		text, _ := tu.MessageEntities(mecs...)
-		stdo.Println(text)
-		stdo.Println("MessageID", MessageID)
+		ltf.Println(text)
+		ltf.Println("MessageID", MessageID)
 	}
 	return MessageID, strconv.Itoa(MessageID)
 }

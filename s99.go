@@ -14,7 +14,7 @@ func s99(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 	br, ca := chrome(slide)
 	defer ca()
 	page := chromePage(br, slide).
@@ -84,7 +84,7 @@ func s99(slide, deb int) {
 		sdpt(slide, deb, page, tit)
 		ex(slide, fmt.Errorf(tit))
 	}).Race().Search(ti).MustHandle(func(e *rod.Element) {
-		stdo.Println(page.MustSearch(ti).MustHTML())
+		ltf.Println(page.MustSearch(ti).MustHTML())
 		sdpf(slide, deb, page, fmt.Sprintf("%02d %s.png", slide, ti))
 		ex(slide, fmt.Errorf(ti))
 	}).Search(tit).MustHandle(func(e *rod.Element) {

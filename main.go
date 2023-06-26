@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -28,7 +27,7 @@ const (
 )
 
 var (
-	stdo         *log.Logger
+	// stdo         *log.Logger
 	cd           string // s:\bin
 	root         string // s:
 	exit         int    = 2
@@ -57,10 +56,10 @@ func main() {
 		exit = 0
 		closer.Close()
 	}()
-	stdo = log.New(os.Stdout, "", log.Lshortfile|log.Ltime)
+	// stdo = log.New(os.Stdout, "", log.Lshortfile|log.Ltime)
 	cd, err = os.Getwd()
 	ex(2, err)
-	stdo.Println("Getwd:", cd)
+	li.Println("Getwd:", cd)
 	root = filepath.Dir(cd)
 	slides := []int{}
 
@@ -133,7 +132,7 @@ func main() {
 		if !multiBrowser {
 			bro.MustClose()
 		}
-		stdo.Println("main done", exit)
+		ltf.Println("main done", exit)
 		switch {
 		case exit == 0:
 		case exit < 0:
@@ -147,12 +146,12 @@ func main() {
 	})
 	started := make(chan int, 10)
 	st := autoStart(started, sec)
-	stdo.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially, "userMode", userMode)
+	li.Println("multiBrowser:", multiBrowser, "headLess:", headLess, "sequentially:", sequentially, "userMode", userMode)
 	for _, de := range slides {
 		if abs(de) > 13 {
 			break
 		}
-		stdo.Println(de)
+		li.Println(de)
 		go start(s01, 1, de, &wg, started)
 		go start(s04, 4, de, &wg, started)
 		go start(s05, 5, de, &wg, started)
@@ -174,7 +173,7 @@ func main() {
 		if de != 0 && abs(de) < 97 {
 			continue
 		}
-		stdo.Println(de)
+		li.Println(de)
 		start(s97, 97, de, nil, nil)        //bat jpgs to mov
 		go start(s98, 98, de, &wg, started) //telegram
 		go start(s99, 99, de, &wg, started) //ss

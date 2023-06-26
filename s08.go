@@ -15,7 +15,7 @@ func s08(slide, deb int) {
 		TaskClosed = "TaskClosed.xlsx"
 		params     = conf.P[strconv.Itoa(abs(slide))]
 	)
-	stdo.Println(params)
+	ltf.Println(params)
 	br, ca := chrome(slide)
 	defer ca()
 	page := chromePage(br, slide).

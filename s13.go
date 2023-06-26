@@ -12,7 +12,7 @@ func s13(slide, deb int) {
 	var (
 		params = conf.P[strconv.Itoa(abs(slide))]
 	)
-	stdo.Println(params, sc, rf)
+	ltf.Println(params, sc, rf)
 	br, ca := chrome(slide)
 	defer ca()
 	page := chromePage(br, slide)

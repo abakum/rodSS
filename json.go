@@ -20,31 +20,31 @@ func loader(fn string) (conf *config, err error) {
 	conf = &obj
 	bytes, err := os.ReadFile(fn)
 	if err != nil {
-		stdo.Println("loader")
+		letf.Println("loader")
 		return
 	}
 	err = json.Unmarshal(bytes, conf)
 	if err != nil {
-		stdo.Println("loader")
+		letf.Println("loader")
 		return
 	}
-	stdo.Println("loader done")
-	stdo.Println(obj.Ids)
+	ltf.Println("loader done")
+	ltf.Println(obj.Ids)
 	return
 }
 
 func (conf *config) saver() (err error) {
-	stdo.Println(conf.Ids)
+	ltf.Println(conf.Ids)
 	bytes, err := json.Marshal(conf)
 	if err != nil {
-		stdo.Println("saver")
+		letf.Println("saver")
 		return
 	}
 	err = os.WriteFile(conf.fn, bytes, 0o644)
 	if err != nil {
-		stdo.Println("saver")
+		letf.Println("saver")
 		return
 	}
-	stdo.Println("saver done")
+	ltf.Println("saver done")
 	return
 }
