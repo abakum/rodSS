@@ -56,7 +56,7 @@ func ex(slide int, err error) {
 	if err != nil {
 		exit = slide
 		let.Println(src(8), err.Error())
-		pressEnter()
+		Scanln()
 		closer.Close()
 		runtime.Goexit()
 	}
@@ -65,7 +65,7 @@ func e(slide int, level int, err error) {
 	if err != nil {
 		exit = slide
 		let.Println(src(level), err.Error())
-		pressEnter()
+		Scanln()
 		closer.Close()
 		runtime.Goexit()
 	}
@@ -163,8 +163,7 @@ func Scanln() {
 	if headLess {
 		return
 	}
-	lt.Print(src(8), "\nPress Enter>")
-	fmt.Scanln()
+	pressEnter()
 }
 
 func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan int) {
