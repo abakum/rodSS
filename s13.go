@@ -24,7 +24,7 @@ func s13(slide, deb int) {
 
 	tit = "mrf"
 	sel := fmt.Sprintf("div[aria-label=%q]", tit)
-	page.Timeout(to).MustElement(sel).MustClick()
+	page.Timeout(to * 2).MustElement(sel).MustClick()
 
 	tit = params[1]
 	sel = fmt.Sprintf("span[title=%q]", tit)
