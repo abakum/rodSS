@@ -25,6 +25,11 @@ func s05(slide, deb int) {
 	page.Timeout(to).MustElement(sel).MustClick()
 	sdpt(slide, deb, page, tit)
 
+	tit = "Месяц"
+	sel = fmt.Sprintf("h3[aria-label=%q]", tit)
+	page.Timeout(to).MustElement(sel).MustHover().MustParent().MustElement("span").MustClick()
+	sdpt(slide, deb, page, tit)
+
 	cb(slide, deb, page, "СЦ/ЦЭ")
 
 	tit = "Ср. длительность работ сотрудника за день, часы"

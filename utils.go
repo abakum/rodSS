@@ -163,7 +163,7 @@ func Scanln() {
 	if headLess {
 		return
 	}
-	pressEnter()
+	// pressEnter()
 }
 
 func start(fu func(slide, deb int), slide, deb int, wg *sync.WaitGroup, started chan int) {
