@@ -56,7 +56,7 @@ func s08(slide, deb int) {
 	sel = "span.ui-tree-toggler"
 	for i := 4; i < 9; i++ {
 		page.Timeout(to).MustElements(sel)[i].MustClick()
-		time.Sleep(ms * 2)
+		time.Sleep(ms * 3)
 	}
 
 	tit = "Группа инсталляций"
