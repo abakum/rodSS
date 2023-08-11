@@ -64,7 +64,7 @@ func s13(slide, deb int) {
 
 	tit = "Пред.Неделя"
 	sel = "div"
-	page.Timeout(to).MustElementR(sel, tit)
+	page.Timeout(to*2).MustElementR(sel, tit)
 	sdpt(slide, deb, page, tit)
 
 	sel = "div.circle"
